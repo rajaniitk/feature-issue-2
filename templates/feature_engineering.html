@@ -18,176 +18,135 @@
 {% endblock %}
 
 {% block content %}
-<!-- Dataset Selection -->
-<div class="fe-container">
-    <div class="card">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <i class="fas fa-database me-2"></i>Select Dataset
-                        </label>
-                        <select class="form-control" id="fe-dataset-select">
-                            <option value="">Choose a dataset...</option>
-                        </select>
+<div class="ml-container">
+    <div class="dashboard-header">
+        <h2>Feature Engineering</h2>
+        <p>Transform and create new features to improve your data quality</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="fe-dataset-select">Select Dataset:</label>
+            <select id="fe-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-fe-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="ml-workflow" id="engineering-panel" style="display: none;">
+        
+        <!-- Features Summary -->
+        <div class="workflow-step">
+            <h3>Dataset Features</h3>
+            <div class="step-content">
+                <div class="features-panel">
+                    <div class="feature-columns">
+                        <h4>Available Features <span id="features-count" class="badge">0 features</span></h4>
+                        <div id="features-summary" class="feature-list">
+                            <!-- Features will be populated here -->
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <button id="refresh-fe-datasets" class="btn">
-                        <i class="fas fa-sync me-2"></i>Refresh
-                    </button>
-                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Main Engineering Panel -->
-<div class="engineering-panel" id="engineering-panel" style="display: none;">
-    
-    <!-- Features Summary -->
-    <div class="fe-container">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-columns me-2"></i>Dataset Features
-                    <span id="features-count" class="badge ms-2">0 features</span>
-                </h5>
-            </div>
-            <div class="card-body">
-                <div id="features-summary">
-                    <!-- Features will be populated here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Transformation Tabs -->
-    <div class="fe-container">
-        <div class="fe-tabs">
-            <button class="fe-tab-button active" data-tab="basic-transformations">
-                <i class="fas fa-cogs me-2"></i>Basic Transformations
-            </button>
-            <button class="fe-tab-button" data-tab="missing-values">
-                <i class="fas fa-question-circle me-2"></i>Missing Values
-            </button>
-            <button class="fe-tab-button" data-tab="feature-creation">
-                <i class="fas fa-plus-circle me-2"></i>Feature Creation
-            </button>
-        </div>
-
-        <!-- Basic Transformations Tab -->
-        <div class="fe-tab-content active" id="basic-transformations">
-            <div class="row">
-                <!-- Scaling -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-expand-arrows-alt me-2"></i>Scaling</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Feature</label>
-                                <select id="scaling-feature" class="form-control">
-                                    <option value="">Select feature...</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Method</label>
-                                <select id="scaling-method" class="form-control">
-                                    <option value="standard">Standard Scaling</option>
-                                    <option value="minmax">Min-Max Scaling</option>
-                                    <option value="robust">Robust Scaling</option>
-                                </select>
+            <h3>Feature Transformations</h3>
+            <div class="step-content">
+                <div class="analysis-sections">
+                    <div class="section-grid">
+                        <!-- Scaling Section -->
+                        <div class="analysis-section">
+                            <h3>Feature Scaling</h3>
+                            <div class="content-area">
+                                <div class="form-group">
+                                    <label for="scaling-feature">Feature:</label>
+                                    <select id="scaling-feature" class="form-control">
+                                        <option value="">Select feature...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="scaling-method">Method:</label>
+                                    <select id="scaling-method" class="form-control">
+                                        <option value="standard">Standard Scaling</option>
+                                        <option value="minmax">Min-Max Scaling</option>
+                                        <option value="robust">Robust Scaling</option>
+                                    </select>
+                                </div>
                             </div>
                             <button id="apply-scaling" class="btn btn-primary">Apply Scaling</button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Encoding -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-code me-2"></i>Encoding</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Feature</label>
-                                <select id="encoding-feature" class="form-control">
-                                    <option value="">Select feature...</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Method</label>
-                                <select id="encoding-method" class="form-control">
-                                    <option value="one_hot">One-Hot Encoding</option>
-                                    <option value="label">Label Encoding</option>
-                                    <option value="frequency">Frequency Encoding</option>
-                                </select>
+                        <!-- Encoding Section -->
+                        <div class="analysis-section">
+                            <h3>Categorical Encoding</h3>
+                            <div class="content-area">
+                                <div class="form-group">
+                                    <label for="encoding-feature">Feature:</label>
+                                    <select id="encoding-feature" class="form-control">
+                                        <option value="">Select feature...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="encoding-method">Method:</label>
+                                    <select id="encoding-method" class="form-control">
+                                        <option value="one_hot">One-Hot Encoding</option>
+                                        <option value="label">Label Encoding</option>
+                                        <option value="frequency">Frequency Encoding</option>
+                                    </select>
+                                </div>
                             </div>
                             <button id="apply-encoding" class="btn btn-primary">Apply Encoding</button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Binning -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-boxes me-2"></i>Binning</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Feature</label>
-                                <select id="binning-feature" class="form-control">
-                                    <option value="">Select feature...</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Bins</label>
-                                <input type="number" id="binning-bins" class="form-control" value="5" min="2" max="20">
-                            </div>
-                            <div class="form-group">
-                                <label>Method</label>
-                                <select id="binning-method" class="form-control">
-                                    <option value="equal_width">Equal Width</option>
-                                    <option value="equal_frequency">Equal Frequency</option>
-                                    <option value="kmeans">K-Means</option>
-                                </select>
+                        <!-- Binning Section -->
+                        <div class="analysis-section">
+                            <h3>Feature Binning</h3>
+                            <div class="content-area">
+                                <div class="form-group">
+                                    <label for="binning-feature">Feature:</label>
+                                    <select id="binning-feature" class="form-control">
+                                        <option value="">Select feature...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="binning-bins">Number of Bins:</label>
+                                    <input type="number" id="binning-bins" class="form-control" value="5" min="2" max="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="binning-method">Method:</label>
+                                    <select id="binning-method" class="form-control">
+                                        <option value="equal_width">Equal Width</option>
+                                        <option value="equal_frequency">Equal Frequency</option>
+                                        <option value="kmeans">K-Means</option>
+                                    </select>
+                                </div>
                             </div>
                             <button id="apply-binning" class="btn btn-primary">Apply Binning</button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Transformation -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="fas fa-function me-2"></i>Mathematical Transform</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Feature</label>
-                                <select id="transformation-feature" class="form-control">
-                                    <option value="">Select feature...</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Method</label>
-                                <select id="transformation-method" class="form-control">
-                                    <option value="log">Log Transform</option>
-                                    <option value="sqrt">Square Root</option>
-                                    <option value="reciprocal">Reciprocal</option>
-                                    <option value="square">Square</option>
-                                </select>
+                        <!-- Mathematical Transform Section -->
+                        <div class="analysis-section">
+                            <h3>Mathematical Transform</h3>
+                            <div class="content-area">
+                                <div class="form-group">
+                                    <label for="transformation-feature">Feature:</label>
+                                    <select id="transformation-feature" class="form-control">
+                                        <option value="">Select feature...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="transformation-method">Method:</label>
+                                    <select id="transformation-method" class="form-control">
+                                        <option value="log">Log Transform</option>
+                                        <option value="sqrt">Square Root</option>
+                                        <option value="reciprocal">Reciprocal</option>
+                                        <option value="square">Square</option>
+                                    </select>
+                                </div>
                             </div>
                             <button id="apply-transformation" class="btn btn-primary">Apply Transform</button>
                         </div>
-                    </div>
-                </div>
             </div>
         </div>
 
