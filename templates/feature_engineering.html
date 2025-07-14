@@ -19,13 +19,13 @@
 
 {% block content %}
 <!-- Dataset Selection -->
-<div class="fe-container glow-important">
+<div class="fe-container">
     <div class="card">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <div class="form-group">
-                        <label class="form-label rainbow-text">
+                        <label class="form-label">
                             <i class="fas fa-database me-2"></i>Select Dataset
                         </label>
                         <select class="form-control" id="fe-dataset-select">
@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <button id="refresh-fe-datasets" class="btn btn-secondary">
+                    <button id="refresh-fe-datasets" class="btn">
                         <i class="fas fa-sync me-2"></i>Refresh
                     </button>
                 </div>
@@ -47,12 +47,12 @@
 <div class="engineering-panel" id="engineering-panel" style="display: none;">
     
     <!-- Features Summary -->
-    <div class="fe-container animate-float-magical">
+    <div class="fe-container">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0 rainbow-text">
+                <h5 class="card-title mb-0">
                     <i class="fas fa-columns me-2"></i>Dataset Features
-                    <span id="features-count" class="badge badge-primary ms-2">0 features</span>
+                    <span id="features-count" class="badge ms-2">0 features</span>
                 </h5>
             </div>
             <div class="card-body">
@@ -64,7 +64,7 @@
     </div>
 
     <!-- Transformation Tabs -->
-    <div class="fe-container animate-rainbow-border">
+    <div class="fe-container">
         <div class="fe-tabs">
             <button class="fe-tab-button active" data-tab="basic-transformations">
                 <i class="fas fa-cogs me-2"></i>Basic Transformations

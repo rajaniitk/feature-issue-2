@@ -60,250 +60,44 @@ def get_columns(dataset_id):
 
 @feature_engineer_bp.route('/download/<int:dataset_id>/<format>', methods=['GET'])
 def download_dataset(dataset_id, format):
-    """Download the current dataset with all applied transformations in the specified format"""
-    from flask import send_file, abort
-    import os
-    import pandas as pd
-    import tempfile
-    
+    """Download dataset - service handles all transformations"""
     try:
-        dataset = Dataset.query.get(dataset_id)
-        if not dataset:
-            logging.error(f"Dataset with ID {dataset_id} not found")
-            abort(404, description=f"Dataset {dataset_id} not found")
-            
+        dataset = Dataset.query.get_or_404(dataset_id)
         processor = DataProcessor()
         
-        # Load the original dataset
+        # Load dataset (service already applies transformations)
         df = processor.load_dataset(dataset)
         if df is None or df.empty:
-            logging.error(f"Failed to load dataset {dataset_id} or dataset is empty")
-            abort(400, description="Dataset could not be loaded or is empty")
+            return jsonify({'success': False, 'error': 'Dataset could not be loaded'}), 400
         
-        # Get all transformations to apply in order
-        transformations = FeatureEngineering.query.filter_by(dataset_id=dataset_id).order_by(FeatureEngineering.created_at).all()
-        
-        if transformations:
-            logging.info(f"Applying {len(transformations)} transformations for download")
+        if format.lower() == 'csv':
+            from flask import make_response
+            from io import StringIO
             
-            # Apply transformations using existing service methods by creating a temporary dataset copy
-            import tempfile
-            with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as temp_file:
-                df.to_csv(temp_file.name, index=False)
-                temp_path = temp_file.name
+            output = StringIO()
+            df.to_csv(output, index=False)
+            output.seek(0)
             
-            # Temporarily update dataset path to work with transformed data
-            original_path = dataset.file_path
-            dataset.file_path = temp_path
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = f"attachment; filename=transformed_{dataset.filename}"
+            response.headers["Content-Type"] = "text/csv"
+            return response
             
-            try:
-                feature_engineer = FeatureEngineer()
-                
-                # Apply each transformation using the existing service methods
-                for transformation in transformations:
-                    try:
-                        params = transformation.parameters
-                        transform_type = transformation.transformation_type
-                        
-                        # Use existing service methods instead of duplicating logic
-                        if transform_type == 'scaling':
-                            result = feature_engineer.scale_features(
-                                dataset_id, 
-                                params.get('columns', []), 
-                                params.get('method', 'standard')
-                            )
-                            if result['success']:
-                                logging.info(f"Applied scaling: {result['message']}")
-                        
-                        elif transform_type == 'encoding':
-                            result = feature_engineer.encode_categorical(
-                                dataset_id,
-                                params.get('columns', []),
-                                params.get('method', 'onehot')
-                            )
-                            if result['success']:
-                                logging.info(f"Applied encoding: {result['message']}")
-                        
-                        elif transform_type == 'binning':
-                            result = feature_engineer.bin_numerical(
-                                dataset_id,
-                                params.get('columns', []),
-                                params.get('method', 'equal_width'),
-                                params.get('bins', 5)
-                            )
-                            if result['success']:
-                                logging.info(f"Applied binning: {result['message']}")
-                        
-                        elif transform_type == 'numerical_transform':
-                            result = feature_engineer.transform_numerical(
-                                dataset_id,
-                                params.get('columns', []),
-                                params.get('method', 'log')
-                            )
-                            if result['success']:
-                                logging.info(f"Applied numerical transform: {result['message']}")
-                        
-                        elif transform_type == 'imputation':
-                            result = feature_engineer.handle_missing_values(
-                                dataset_id,
-                                params.get('columns', []),
-                                params.get('strategy', 'mean')
-                            )
-                            if result['success']:
-                                logging.info(f"Applied imputation: {result['message']}")
-                        
-                        elif transform_type == 'arithmetic':
-                            result = feature_engineer.create_arithmetic_features(
-                                dataset_id,
-                                params.get('feature1'),
-                                params.get('feature2'),
-                                params.get('operation')
-                            )
-                            if result['success']:
-                                logging.info(f"Applied arithmetic feature: {result['message']}")
-                        
-                        elif transform_type == 'polynomial':
-                            result = feature_engineer.polynomial_features(
-                                dataset_id,
-                                params.get('columns', []),
-                                params.get('degree', 2)
-                            )
-                            if result['success']:
-                                logging.info(f"Applied polynomial features: {result['message']}")
-                        
-                        elif transform_type == 'interaction':
-                            result = feature_engineer.interaction_features(
-                                dataset_id,
-                                params.get('columns', [])
-                            )
-                            if result['success']:
-                                logging.info(f"Applied interaction features: {result['message']}")
-                    
-                    except Exception as transform_error:
-                        logging.warning(f"Failed to apply transformation {transformation.id}: {str(transform_error)}")
-                        continue
-                
-                # Load the final transformed dataset
-                df = processor.load_dataset(dataset)
-                
-            finally:
-                # Restore original dataset path and cleanup
-                dataset.file_path = original_path
-                try:
-                    os.unlink(temp_path)
-                except:
-                    pass
-                                        df[f'{col}_squared'] = df[col] ** 2
-                                    elif method == 'reciprocal':
-                                        df[f'{col}_reciprocal'] = 1 / (df[col] + 1e-8)
-                                    logging.info(f"Applied {method} transformation to column: {col}")
-                                except Exception as math_error:
-                                    logging.warning(f"Math transformation failed for {col}: {math_error}")
-                    
-                    elif transform_type == 'missing_values':
-                        strategy = transform_config.get('strategy', 'mean')
-                        for col in columns:
-                            if col in df.columns:
-                                try:
-                                    if strategy == 'mean' and df[col].dtype in ['int64', 'float64']:
-                                        df[col].fillna(df[col].mean(), inplace=True)
-                                    elif strategy == 'median' and df[col].dtype in ['int64', 'float64']:
-                                        df[col].fillna(df[col].median(), inplace=True)
-                                    elif strategy == 'mode':
-                                        mode_val = df[col].mode()
-                                        if not mode_val.empty:
-                                            df[col].fillna(mode_val.iloc[0], inplace=True)
-                                    elif strategy == 'forward_fill':
-                                        df[col].fillna(method='ffill', inplace=True)
-                                    elif strategy == 'backward_fill':
-                                        df[col].fillna(method='bfill', inplace=True)
-                                    elif strategy == 'drop':
-                                        df.dropna(subset=[col], inplace=True)
-                                    logging.info(f"Applied {strategy} missing value handling to column: {col}")
-                                except Exception as missing_error:
-                                    logging.warning(f"Missing value handling failed for {col}: {missing_error}")
-                    
-                    elif transform_type == 'feature_creation':
-                        feature1 = transform_config.get('feature1')
-                        feature2 = transform_config.get('feature2')
-                        operation = transform_config.get('operation')
-                        if feature1 in df.columns and feature2 in df.columns:
-                            try:
-                                if operation == 'add':
-                                    df[f'{feature1}_plus_{feature2}'] = df[feature1] + df[feature2]
-                                elif operation == 'subtract':
-                                    df[f'{feature1}_minus_{feature2}'] = df[feature1] - df[feature2]
-                                elif operation == 'multiply':
-                                    df[f'{feature1}_times_{feature2}'] = df[feature1] * df[feature2]
-                                elif operation == 'divide':
-                                    df[f'{feature1}_div_{feature2}'] = df[feature1] / (df[feature2] + 1e-8)
-                                logging.info(f"Created feature: {feature1} {operation} {feature2}")
-                            except Exception as creation_error:
-                                logging.warning(f"Feature creation failed: {creation_error}")
-                    
-                except Exception as e:
-                    logging.warning(f"Failed to apply transformation {transformation.id}: {str(e)}")
-                    continue
-        
-        # Create download with proper error handling
-        temp_file = None
-        try:
-            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=f'.{format}')
+        elif format.lower() == 'json':
+            return jsonify({
+                'success': True,
+                'data': df.to_dict(orient='records'),
+                'filename': f'transformed_{dataset.filename}',
+                'rows': len(df),
+                'columns': len(df.columns)
+            })
             
-            if format == 'csv':
-                df.to_csv(temp_file.name, index=False)
-                mimetype = 'text/csv'
-                file_ext = 'csv'
-            elif format == 'excel':
-                df.to_excel(temp_file.name, index=False)
-                mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_ext = 'xlsx'
-            elif format == 'json':
-                df.to_json(temp_file.name, orient='records', indent=2)
-                mimetype = 'application/json'
-                file_ext = 'json'
-            else:
-                if temp_file:
-                    temp_file.close()
-                    os.unlink(temp_file.name)
-                abort(400, description="Invalid format. Supported: csv, excel, json")
-                
-            temp_file.close()
-            
-            # Generate descriptive filename
-            base_name = dataset.filename.rsplit('.', 1)[0] if dataset.filename else f"dataset_{dataset_id}"
-            status = "with_transformations" if transformations else "original"
-            filename = f"{base_name}_{status}.{file_ext}"
-            
-            logging.info(f"Sending download: {filename} ({len(df)} rows, {len(df.columns)} columns)")
-            
-            return send_file(
-                temp_file.name,
-                mimetype=mimetype,
-                as_attachment=True,
-                download_name=filename
-            )
-            
-        except Exception as file_error:
-            if temp_file and hasattr(temp_file, 'name') and os.path.exists(temp_file.name):
-                try:
-                    os.unlink(temp_file.name)
-                except:
-                    pass
-            logging.error(f"File processing error: {str(file_error)}")
-            raise file_error
+        else:
+            return jsonify({'success': False, 'error': 'Unsupported format'}), 400
             
     except Exception as e:
         logging.error(f"Download error: {str(e)}")
-        import traceback
-        logging.error(f"Full traceback: {traceback.format_exc()}")
-        
-        # Return a JSON error response instead of aborting
-        return jsonify({
-            'success': False,
-            'error': f'Download failed: {str(e)}',
-            'message': 'Please try again or contact support if the issue persists.'
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @feature_engineer_bp.route('/scale', methods=['POST'])
 def apply_scaling():
