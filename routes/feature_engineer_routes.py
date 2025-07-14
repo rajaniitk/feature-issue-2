@@ -4,6 +4,8 @@ from services.data_processor import DataProcessor
 from database import db
 from models import Dataset, Feature, FeatureEngineering
 import logging
+import numpy as np
+import pandas as pd
 
 feature_engineer_bp = Blueprint('feature_engineer', __name__, url_prefix='/api/feature')
 
@@ -58,7 +60,7 @@ def get_columns(dataset_id):
 
 @feature_engineer_bp.route('/download/<int:dataset_id>/<format>', methods=['GET'])
 def download_dataset(dataset_id, format):
-    """Download the current dataset (original or transformed) in the specified format"""
+    """Download the current dataset with all applied transformations in the specified format"""
     from flask import send_file, abort
     import os
     import pandas as pd
@@ -72,16 +74,108 @@ def download_dataset(dataset_id, format):
             
         processor = DataProcessor()
         
-        # Load the current dataset (now always loads original since we fixed the save issue)
+        # Load the original dataset
         df = processor.load_dataset(dataset)
         if df is None or df.empty:
             logging.error(f"Failed to load dataset {dataset_id} or dataset is empty")
             abort(400, description="Dataset could not be loaded or is empty")
         
-        # Check if we have any transformations to include
-        transformations = FeatureEngineering.query.filter_by(dataset_id=dataset_id).all()
+        # Check if we have any transformations to apply
+        transformations = FeatureEngineering.query.filter_by(dataset_id=dataset_id).order_by(FeatureEngineering.created_at).all()
+        
         if transformations:
-            logging.info(f"Found {len(transformations)} transformations for dataset {dataset_id}")
+            logging.info(f"Applying {len(transformations)} transformations for dataset {dataset_id}")
+            
+            # Apply all transformations in chronological order
+            feature_engineer = FeatureEngineer()
+            for transformation in transformations:
+                try:
+                    transform_config = transformation.transformation_config
+                    if isinstance(transform_config, str):
+                        import json
+                        transform_config = json.loads(transform_config)
+                    
+                    transform_type = transformation.transformation_type
+                    
+                    # Apply the transformation based on type
+                    if transform_type == 'scaling':
+                        columns = transform_config.get('columns', [])
+                        method = transform_config.get('method', 'standard')
+                        if columns and all(col in df.columns for col in columns):
+                            scaler = feature_engineer._get_fresh_scaler(method)
+                            df[columns] = scaler.fit_transform(df[columns])
+                    
+                    elif transform_type == 'encoding':
+                        columns = transform_config.get('columns', [])
+                        method = transform_config.get('method', 'onehot')
+                        for col in columns:
+                            if col in df.columns:
+                                if method == 'onehot':
+                                    dummies = pd.get_dummies(df[col], prefix=col)
+                                    df = pd.concat([df.drop(col, axis=1), dummies], axis=1)
+                                elif method == 'label':
+                                    from sklearn.preprocessing import LabelEncoder
+                                    le = LabelEncoder()
+                                    df[col] = le.fit_transform(df[col].astype(str))
+                    
+                    elif transform_type == 'binning':
+                        columns = transform_config.get('columns', [])
+                        bins = transform_config.get('bins', 5)
+                        method = transform_config.get('method', 'equal_width')
+                        for col in columns:
+                            if col in df.columns:
+                                if method == 'equal_width':
+                                    df[f'{col}_binned'] = pd.cut(df[col], bins=bins, labels=False)
+                                elif method == 'equal_frequency':
+                                    df[f'{col}_binned'] = pd.qcut(df[col], q=bins, labels=False, duplicates='drop')
+                    
+                    elif transform_type == 'mathematical':
+                        columns = transform_config.get('columns', [])
+                        method = transform_config.get('method', 'log')
+                        for col in columns:
+                            if col in df.columns:
+                                if method == 'log':
+                                    df[f'{col}_log'] = np.log1p(np.abs(df[col]))
+                                elif method == 'sqrt':
+                                    df[f'{col}_sqrt'] = np.sqrt(np.abs(df[col]))
+                                elif method == 'square':
+                                    df[f'{col}_squared'] = df[col] ** 2
+                                elif method == 'reciprocal':
+                                    df[f'{col}_reciprocal'] = 1 / (df[col] + 1e-8)
+                    
+                    elif transform_type == 'missing_values':
+                        columns = transform_config.get('columns', [])
+                        strategy = transform_config.get('strategy', 'mean')
+                        for col in columns:
+                            if col in df.columns:
+                                if strategy == 'mean' and df[col].dtype in ['int64', 'float64']:
+                                    df[col].fillna(df[col].mean(), inplace=True)
+                                elif strategy == 'median' and df[col].dtype in ['int64', 'float64']:
+                                    df[col].fillna(df[col].median(), inplace=True)
+                                elif strategy == 'mode':
+                                    df[col].fillna(df[col].mode().iloc[0] if not df[col].mode().empty else 0, inplace=True)
+                                elif strategy == 'forward_fill':
+                                    df[col].fillna(method='ffill', inplace=True)
+                                elif strategy == 'backward_fill':
+                                    df[col].fillna(method='bfill', inplace=True)
+                    
+                    elif transform_type == 'feature_creation':
+                        feature1 = transform_config.get('feature1')
+                        feature2 = transform_config.get('feature2')
+                        operation = transform_config.get('operation')
+                        if feature1 in df.columns and feature2 in df.columns:
+                            if operation == 'add':
+                                df[f'{feature1}_plus_{feature2}'] = df[feature1] + df[feature2]
+                            elif operation == 'subtract':
+                                df[f'{feature1}_minus_{feature2}'] = df[feature1] - df[feature2]
+                            elif operation == 'multiply':
+                                df[f'{feature1}_times_{feature2}'] = df[feature1] * df[feature2]
+                            elif operation == 'divide':
+                                df[f'{feature1}_div_{feature2}'] = df[feature1] / (df[feature2] + 1e-8)
+                    
+                except Exception as e:
+                    logging.warning(f"Failed to apply transformation {transformation.id}: {str(e)}")
+                    continue
         
         # Create download with proper error handling
         temp_file = None

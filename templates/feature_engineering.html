@@ -19,13 +19,13 @@
 
 {% block content %}
 <!-- Dataset Selection -->
-<div class="fe-container">
+<div class="fe-container glow-important">
     <div class="card">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <div class="form-group">
-                        <label class="form-label">
+                        <label class="form-label rainbow-text">
                             <i class="fas fa-database me-2"></i>Select Dataset
                         </label>
                         <select class="form-control" id="fe-dataset-select">
@@ -47,10 +47,10 @@
 <div class="engineering-panel" id="engineering-panel" style="display: none;">
     
     <!-- Features Summary -->
-    <div class="fe-container">
+    <div class="fe-container animate-float-magical">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">
+                <h5 class="card-title mb-0 rainbow-text">
                     <i class="fas fa-columns me-2"></i>Dataset Features
                     <span id="features-count" class="badge badge-primary ms-2">0 features</span>
                 </h5>
@@ -64,7 +64,7 @@
     </div>
 
     <!-- Transformation Tabs -->
-    <div class="fe-container">
+    <div class="fe-container animate-rainbow-border">
         <div class="fe-tabs">
             <button class="fe-tab-button active" data-tab="basic-transformations">
                 <i class="fas fa-cogs me-2"></i>Basic Transformations
@@ -274,10 +274,10 @@
     </div>
 
     <!-- Engineered Features List -->
-    <div class="fe-container">
+    <div class="fe-container animate-glow-epic">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">
+                <h5 class="card-title mb-0 rainbow-text">
                     <i class="fas fa-magic me-2"></i>Engineered Features
                 </h5>
                 <div class="btn-group">
@@ -298,27 +298,28 @@
 
 <!-- Download Section -->
 <div class="download-section" id="download-section" style="display: none;">
-    <h3><i class="fas fa-download"></i> Download Processed Dataset</h3>
-    <p>Your dataset has been processed with the applied feature engineering transformations.</p>
+    <h3 class="rainbow-text"><i class="fas fa-download"></i> Download Transformed Dataset</h3>
+    <p><strong>✨ Your dataset includes ALL applied feature engineering transformations! ✨</strong></p>
+    <p>Download your enhanced dataset with scaling, encoding, binning, transformations, and new features.</p>
     <div class="download-options">
         <button class="download-btn" onclick="downloadDataset('csv')">
             <i class="fas fa-file-csv"></i>
-            Download CSV
+            Download Transformed CSV
         </button>
         <button class="download-btn" onclick="downloadDataset('excel')">
             <i class="fas fa-file-excel"></i>
-            Download Excel
+            Download Transformed Excel
         </button>
         <button class="download-btn" onclick="downloadDataset('json')">
             <i class="fas fa-file-code"></i>
-            Download JSON
+            Download Transformed JSON
         </button>
     </div>
     <div class="progress-container" id="download-progress" style="display: none;">
         <div class="progress-bar">
             <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <p id="progress-text">Preparing download...</p>
+        <p id="progress-text">Preparing transformed dataset download...</p>
     </div>
 </div>
 

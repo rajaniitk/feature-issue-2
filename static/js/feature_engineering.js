@@ -866,7 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Create a temporary link to trigger download
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.download = `dataset_${currentDatasetId}_${Date.now()}.${format}`;
+            link.download = `transformed_dataset_${currentDatasetId}_${Date.now()}.${format}`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -877,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show success message after a brief delay
             setTimeout(() => {
                 hideDownloadProgress();
-                showSuccessNotification(`Dataset download completed in ${format.toUpperCase()} format!`);
+                showSuccessNotification(`✨ Transformed dataset download completed in ${format.toUpperCase()} format! All your feature engineering transformations are included! ✨`);
             }, 1000);
             
         } catch (error) {

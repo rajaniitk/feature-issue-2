@@ -44,13 +44,20 @@
     max-width: 1600px;
     margin: 0 auto 3rem;
     padding: 3rem;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    background: var(--gradient-cosmic);
     border-radius: 30px;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-epic);
+    box-shadow: var(--shadow-epic), 0 0 50px rgba(102, 126, 234, 0.3);
     backdrop-filter: blur(20px);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    transition: var(--transition-magic);
+}
+
+.fe-container:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover), 0 0 80px rgba(102, 126, 234, 0.5);
+    border-color: rgba(240, 147, 251, 0.8);
 }
 
 .fe-container::before {
@@ -169,8 +176,8 @@
 .card {
     background: linear-gradient(145deg, #ffffff 0%, #f8f9fe 100%);
     border-radius: 25px;
-    box-shadow: var(--shadow-epic);
-    border: 3px solid transparent;
+    box-shadow: var(--shadow-epic), 0 0 25px rgba(102, 126, 234, 0.15);
+    border: 3px solid rgba(102, 126, 234, 0.2);
     overflow: hidden;
     transition: var(--transition-magic);
     position: relative;
@@ -467,9 +474,9 @@
 .fe-tab-button {
     flex: 1;
     padding: 2rem 3rem;
-    border: 3px solid transparent;
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    color: #4a5568;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    background: var(--gradient-purple);
+    color: white;
     font-weight: 900;
     border-radius: 20px;
     cursor: pointer;
@@ -479,7 +486,7 @@
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-size: 1rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
 .fe-tab-button::before {
@@ -795,14 +802,14 @@
 .form-control {
     width: 100%;
     padding: 1.5rem 2rem;
-    border: 3px solid #e2e8f0;
+    border: 3px solid rgba(102, 126, 234, 0.3);
     border-radius: 18px;
     background: linear-gradient(145deg, #ffffff 0%, #f7fafc 100%);
     font-size: 1rem;
     transition: var(--transition-magic);
     font-weight: 600;
     box-sizing: border-box;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
     backdrop-filter: blur(5px);
 }
 
@@ -1044,3 +1051,147 @@
 .mt-1 { margin-top: 0.5rem; }
 .mt-2 { margin-top: 1rem; }
 .mt-3 { margin-top: 2rem; }
+
+/* ===== 🌈 ADDITIONAL COLORFUL ENHANCEMENTS ===== */
+.engineering-panel {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced colorful dataset selection */
+#fe-dataset-select {
+    background: var(--gradient-aurora) !important;
+    color: white !important;
+    border: 3px solid rgba(255, 255, 255, 0.4) !important;
+    font-weight: 700 !important;
+}
+
+#fe-dataset-select option {
+    background: #667eea;
+    color: white;
+}
+
+/* Refresh button enhancement */
+#refresh-fe-datasets {
+    background: var(--gradient-teal) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 700 !important;
+    box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4) !important;
+}
+
+#refresh-fe-datasets:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(67, 233, 123, 0.6) !important;
+}
+
+/* Enhanced feature summary badges */
+#features-count {
+    background: var(--gradient-pink) !important;
+    color: white !important;
+    border-radius: 25px !important;
+    padding: 0.8rem 1.5rem !important;
+    font-weight: 800 !important;
+    box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4) !important;
+}
+
+/* Enhanced download section */
+.download-section {
+    background: var(--gradient-rainbow) !important;
+    border: 4px solid rgba(255, 255, 255, 0.5) !important;
+    animation: pulse-glow-epic 3s ease-in-out infinite !important;
+}
+
+/* Special button hover effects */
+.btn:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    animation: glow-pulse-epic 2s ease-in-out infinite !important;
+}
+
+/* Feature engineering specific button colors */
+#apply-scaling {
+    background: var(--gradient-purple) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+}
+
+#apply-encoding {
+    background: var(--gradient-pink) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4) !important;
+}
+
+#apply-binning {
+    background: var(--gradient-teal) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4) !important;
+}
+
+#apply-transformation {
+    background: var(--gradient-green) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 25px rgba(56, 249, 215, 0.4) !important;
+}
+
+#handle-missing {
+    background: var(--gradient-orange) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 25px rgba(253, 160, 133, 0.4) !important;
+}
+
+#create-features {
+    background: var(--gradient-coral) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 25px rgba(255, 154, 158, 0.4) !important;
+}
+
+/* Enhanced feature management buttons */
+#preview-features, #export-features, #reset-features {
+    font-weight: 700 !important;
+    border-radius: 20px !important;
+    padding: 1rem 2rem !important;
+    transition: var(--transition-magic) !important;
+}
+
+#preview-features {
+    background: var(--gradient-electric) !important;
+    color: white !important;
+    border: none !important;
+}
+
+#export-features {
+    background: var(--gradient-fire) !important;
+    color: white !important;
+    border: none !important;
+}
+
+#reset-features {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Rainbow animation for special elements */
+.rainbow-text {
+    background: var(--gradient-rainbow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow-flow 3s ease-in-out infinite;
+}
+
+/* Pulsing glow effect for important sections */
+.glow-important {
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.5), 0 0 60px rgba(240, 147, 251, 0.3);
+    animation: glow-pulse-epic 2s ease-in-out infinite;
+}
