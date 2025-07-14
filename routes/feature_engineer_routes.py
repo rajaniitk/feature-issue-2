@@ -1,4 +1,4 @@
-THIS SHOULD BE A LINTER ERRORfrom flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session
 from services.feature_engineer import FeatureEngineer
 from services.data_processor import DataProcessor
 from database import db
@@ -100,51 +100,101 @@ def download_dataset(dataset_id, format):
                     transform_type = transformation.transformation_type
                     columns = transform_config.get('columns', [])
                     
-                    # Use the service methods for consistency
+                    # Apply transformations directly to DataFrame for download
                     if transform_type == 'scaling':
                         method = transform_config.get('method', 'standard')
                         if columns and all(col in df.columns for col in columns):
-                            result = feature_engineer.scale_features(dataset_id, columns, method)
-                            if result.get('success') and 'transformed_data' in result:
-                                df = result['transformed_data']
+                            scaler = feature_engineer._get_fresh_scaler(method)
+                            df[columns] = scaler.fit_transform(df[columns])
+                            logging.info(f"Applied {method} scaling to columns: {columns}")
                     
                     elif transform_type == 'encoding':
                         method = transform_config.get('method', 'onehot')
-                        if columns and all(col in df.columns for col in columns):
-                            result = feature_engineer.encode_categorical(dataset_id, columns, method)
-                            if result.get('success') and 'transformed_data' in result:
-                                df = result['transformed_data']
+                        for col in columns:
+                            if col in df.columns:
+                                if method == 'onehot':
+                                    dummies = pd.get_dummies(df[col], prefix=col)
+                                    df = pd.concat([df.drop(col, axis=1), dummies], axis=1)
+                                elif method == 'label':
+                                    from sklearn.preprocessing import LabelEncoder
+                                    le = LabelEncoder()
+                                    df[col] = le.fit_transform(df[col].astype(str))
+                                elif method == 'frequency':
+                                    freq_encoding = df[col].value_counts().to_dict()
+                                    df[col] = df[col].map(freq_encoding)
+                                logging.info(f"Applied {method} encoding to column: {col}")
                     
                     elif transform_type == 'binning':
                         bins = transform_config.get('bins', 5)
                         method = transform_config.get('method', 'equal_width')
-                        if columns and all(col in df.columns for col in columns):
-                            result = feature_engineer.bin_numerical(dataset_id, columns, method, bins)
-                            if result.get('success') and 'transformed_data' in result:
-                                df = result['transformed_data']
+                        for col in columns:
+                            if col in df.columns and pd.api.types.is_numeric_dtype(df[col]):
+                                try:
+                                    if method == 'equal_width':
+                                        df[f'{col}_binned'] = pd.cut(df[col], bins=bins, labels=False)
+                                    elif method == 'equal_frequency':
+                                        df[f'{col}_binned'] = pd.qcut(df[col], q=bins, labels=False, duplicates='drop')
+                                    logging.info(f"Applied {method} binning to column: {col}")
+                                except Exception as bin_error:
+                                    logging.warning(f"Binning failed for {col}: {bin_error}")
                     
                     elif transform_type == 'mathematical':
                         method = transform_config.get('method', 'log')
-                        if columns and all(col in df.columns for col in columns):
-                            result = feature_engineer.transform_numerical(dataset_id, columns, method)
-                            if result.get('success') and 'transformed_data' in result:
-                                df = result['transformed_data']
+                        for col in columns:
+                            if col in df.columns and pd.api.types.is_numeric_dtype(df[col]):
+                                try:
+                                    if method == 'log':
+                                        df[f'{col}_log'] = np.log1p(np.abs(df[col]))
+                                    elif method == 'sqrt':
+                                        df[f'{col}_sqrt'] = np.sqrt(np.abs(df[col]))
+                                    elif method == 'square':
+                                        df[f'{col}_squared'] = df[col] ** 2
+                                    elif method == 'reciprocal':
+                                        df[f'{col}_reciprocal'] = 1 / (df[col] + 1e-8)
+                                    logging.info(f"Applied {method} transformation to column: {col}")
+                                except Exception as math_error:
+                                    logging.warning(f"Math transformation failed for {col}: {math_error}")
                     
                     elif transform_type == 'missing_values':
                         strategy = transform_config.get('strategy', 'mean')
-                        if columns and all(col in df.columns for col in columns):
-                            result = feature_engineer.handle_missing_values(dataset_id, columns, strategy)
-                            if result.get('success') and 'transformed_data' in result:
-                                df = result['transformed_data']
+                        for col in columns:
+                            if col in df.columns:
+                                try:
+                                    if strategy == 'mean' and df[col].dtype in ['int64', 'float64']:
+                                        df[col].fillna(df[col].mean(), inplace=True)
+                                    elif strategy == 'median' and df[col].dtype in ['int64', 'float64']:
+                                        df[col].fillna(df[col].median(), inplace=True)
+                                    elif strategy == 'mode':
+                                        mode_val = df[col].mode()
+                                        if not mode_val.empty:
+                                            df[col].fillna(mode_val.iloc[0], inplace=True)
+                                    elif strategy == 'forward_fill':
+                                        df[col].fillna(method='ffill', inplace=True)
+                                    elif strategy == 'backward_fill':
+                                        df[col].fillna(method='bfill', inplace=True)
+                                    elif strategy == 'drop':
+                                        df.dropna(subset=[col], inplace=True)
+                                    logging.info(f"Applied {strategy} missing value handling to column: {col}")
+                                except Exception as missing_error:
+                                    logging.warning(f"Missing value handling failed for {col}: {missing_error}")
                     
                     elif transform_type == 'feature_creation':
                         feature1 = transform_config.get('feature1')
                         feature2 = transform_config.get('feature2')
                         operation = transform_config.get('operation')
                         if feature1 in df.columns and feature2 in df.columns:
-                            result = feature_engineer.create_arithmetic_features(dataset_id, feature1, feature2, operation)
-                            if result.get('success') and 'transformed_data' in result:
-                                df = result['transformed_data']
+                            try:
+                                if operation == 'add':
+                                    df[f'{feature1}_plus_{feature2}'] = df[feature1] + df[feature2]
+                                elif operation == 'subtract':
+                                    df[f'{feature1}_minus_{feature2}'] = df[feature1] - df[feature2]
+                                elif operation == 'multiply':
+                                    df[f'{feature1}_times_{feature2}'] = df[feature1] * df[feature2]
+                                elif operation == 'divide':
+                                    df[f'{feature1}_div_{feature2}'] = df[feature1] / (df[feature2] + 1e-8)
+                                logging.info(f"Created feature: {feature1} {operation} {feature2}")
+                            except Exception as creation_error:
+                                logging.warning(f"Feature creation failed: {creation_error}")
                     
                 except Exception as e:
                     logging.warning(f"Failed to apply transformation {transformation.id}: {str(e)}")
