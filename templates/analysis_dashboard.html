@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Dashboard{% endblock %}
+
+{% block header_title %}Analysis Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h2>Data Analysis Dashboard</h2>
+        <p>Comprehensive analysis of your dataset with statistical insights and visualizations</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="dataset-select">Select Dataset:</label>
+            <select id="dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div id="dataset-info" class="dataset-info" style="display: none;">
+        <div class="info-cards">
+            <div class="info-card">
+                <h3>Rows</h3>
+                <span id="rows-count">-</span>
+            </div>
+            <div class="info-card">
+                <h3>Columns</h3>
+                <span id="columns-count">-</span>
+            </div>
+            <div class="info-card">
+                <h3>Missing Values</h3>
+                <span id="missing-count">-</span>
+            </div>
+            <div class="info-card">
+                <h3>File Size</h3>
+                <span id="file-size">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="analysis-sections">
+        <div class="section-grid">
+            <div class="analysis-section">
+                <h3>Basic Statistics</h3>
+                <div id="basic-stats" class="content-area">
+                    <p>Select a dataset to view basic statistics</p>
+                </div>
+                <button id="generate-stats" class="btn btn-primary" disabled>Generate Statistics</button>
+            </div>
+
+            <div class="analysis-section">
+                <h3>Data Types</h3>
+                <div id="data-types" class="content-area">
+                    <p>Select a dataset to view data types</p>
+                </div>
+                <button id="show-types" class="btn btn-primary" disabled>Show Data Types</button>
+            </div>
+
+            <div class="analysis-section">
+                <h3>Missing Values Analysis</h3>
+                <div id="missing-analysis" class="content-area">
+                    <p>Select a dataset to analyze missing values</p>
+                </div>
+                <button id="analyze-missing" class="btn btn-primary" disabled>Analyze Missing Values</button>
+            </div>
+
+            <div class="analysis-section">
+                <h3>Correlation Matrix</h3>
+                <div id="correlation-matrix" class="content-area">
+                    <p>Select a dataset to view correlation matrix</p>
+                </div>
+                <button id="generate-correlation" class="btn btn-primary" disabled>Generate Correlation</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-preview-section" id="data-preview" style="display: none;">
+        <h3>Data Preview</h3>
+        <div class="preview-controls">
+            <button id="show-head" class="btn btn-secondary">Show Head</button>
+            <button id="show-tail" class="btn btn-secondary">Show Tail</button>
+            <button id="show-sample" class="btn btn-secondary">Random Sample</button>
+        </div>
+        <div id="preview-content" class="preview-content">
+            <!-- Data preview will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<div id="loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Processing your data...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analysis_dashboard.js') }}"></script>
+{% endblock %}

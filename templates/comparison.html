@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Data Comparison{% endblock %}
+
+{% block header_title %}Data Comparison{% endblock %}
+
+{% block content %}
+<div class="comparison-container">
+    <div class="dashboard-header">
+        <h2>Data Comparison</h2>
+        <p>Compare datasets, columns, and data segments</p>
+    </div>
+
+    <div class="comparison-type-selector">
+        <h3>Comparison Type</h3>
+        <div class="type-buttons">
+            <button id="dataset-comparison" class="type-btn active" data-type="dataset">Dataset Comparison</button>
+            <button id="column-comparison" class="type-btn" data-type="column">Column Comparison</button>
+            <button id="segment-comparison" class="type-btn" data-type="segment">Segment Comparison</button>
+        </div>
+    </div>
+
+    <!-- Dataset Comparison -->
+    <div id="dataset-comparison-panel" class="comparison-panel active">
+        <h4>Compare Datasets</h4>
+        <div class="dataset-selectors">
+            <div class="selector-group">
+                <label for="dataset1-select">First Dataset:</label>
+                <select id="dataset1-select" class="form-control">
+                    <option value="">Choose first dataset...</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label for="dataset2-select">Second Dataset:</label>
+                <select id="dataset2-select" class="form-control">
+                    <option value="">Choose second dataset...</option>
+                </select>
+            </div>
+        </div>
+        <button id="compare-datasets" class="btn btn-primary">Compare Datasets</button>
+    </div>
+
+    <!-- Column Comparison -->
+    <div id="column-comparison-panel" class="comparison-panel">
+        <h4>Compare Columns</h4>
+        <div class="column-selectors">
+            <div class="selector-group">
+                <label for="col-dataset-select">Select Dataset:</label>
+                <select id="col-dataset-select" class="form-control">
+                    <option value="">Choose dataset...</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label for="column1-select">First Column:</label>
+                <select id="column1-select" class="form-control">
+                    <option value="">Choose first column...</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label for="column2-select">Second Column:</label>
+                <select id="column2-select" class="form-control">
+                    <option value="">Choose second column...</option>
+                </select>
+            </div>
+        </div>
+        <button id="compare-columns" class="btn btn-primary">Compare Columns</button>
+    </div>
+
+    <!-- Segment Comparison -->
+    <div id="segment-comparison-panel" class="comparison-panel">
+        <h4>Compare Data Segments</h4>
+        <div class="segment-selectors">
+            <div class="selector-group">
+                <label for="seg-dataset-select">Select Dataset:</label>
+                <select id="seg-dataset-select" class="form-control">
+                    <option value="">Choose dataset...</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label for="segment-column">Segmentation Column:</label>
+                <select id="segment-column" class="form-control">
+                    <option value="">Choose segmentation column...</option>
+                </select>
+            </div>
+            <div class="selector-group">
+                <label for="target-column">Target Column:</label>
+                <select id="target-column" class="form-control">
+                    <option value="">Choose target column...</option>
+                </select>
+            </div>
+        </div>
+        <button id="compare-segments" class="btn btn-primary">Compare Segments</button>
+    </div>
+
+    <div class="comparison-results" id="comparison-results" style="display: none;">
+        <h3>Comparison Results</h3>
+        
+        <!-- Summary Cards -->
+        <div class="comparison-summary">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>Similarity Score</h4>
+                    <span id="similarity-score">-</span>
+                </div>
+                <div class="summary-card">
+                    <h4>Statistical Significance</h4>
+                    <span id="significance-level">-</span>
+                </div>
+                <div class="summary-card">
+                    <h4>Effect Size</h4>
+                    <span id="effect-size">-</span>
+                </div>
+                <div class="summary-card">
+                    <h4>Recommendation</h4>
+                    <span id="recommendation">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Comparison -->
+        <div class="detailed-comparison">
+            <div class="comparison-tabs">
+                <button class="comp-tab-button active" data-tab="overview">Overview</button>
+                <button class="comp-tab-button" data-tab="schema">Schema</button>
+                <button class="comp-tab-button" data-tab="statistics">Statistics</button>
+                <button class="comp-tab-button" data-tab="quality">Quality</button>
+                <button class="comp-tab-button" data-tab="tests">Statistical Tests</button>
+                <button class="comp-tab-button" data-tab="visualizations">Visualizations</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview" class="comp-tab-content active">
+                <h4>Comparison Overview</h4>
+                <div id="overview-content">
+                    <!-- Overview content will be populated here -->
+                </div>
+            </div>
+
+            <!-- Schema Tab -->
+            <div id="schema" class="comp-tab-content">
+                <h4>Schema Comparison</h4>
+                <div id="schema-content">
+                    <!-- Schema comparison will be populated here -->
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div id="statistics" class="comp-tab-content">
+                <h4>Descriptive Statistics</h4>
+                <div id="statistics-content">
+                    <!-- Statistics comparison will be populated here -->
+                </div>
+            </div>
+
+            <!-- Quality Tab -->
+            <div id="quality" class="comp-tab-content">
+                <h4>Data Quality Comparison</h4>
+                <div id="quality-content">
+                    <!-- Quality comparison will be populated here -->
+                </div>
+            </div>
+
+            <!-- Distributions Tab -->
+            <div id="distributions" class="comp-tab-content">
+                <h4>Distribution Comparison</h4>
+                <div class="distribution-controls">
+                    <button id="show-overlaid-hist" class="btn btn-secondary">Overlaid Histograms</button>
+                    <button id="show-box-comparison" class="btn btn-secondary">Box Plot Comparison</button>
+                    <button id="show-qq-plot" class="btn btn-secondary">Q-Q Plot</button>
+                </div>
+                <div id="distributions-content">
+                    <!-- Distribution comparison charts will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Statistical Tests Tab -->
+            <div id="tests" class="comp-tab-content">
+                <h4>Statistical Tests</h4>
+                <div class="test-controls">
+                    <div class="form-group">
+                        <label for="test-type">Select Test:</label>
+                        <select id="test-type" class="form-control">
+                            <option value="ttest">T-Test</option>
+                            <option value="mannwhitney">Mann-Whitney U Test</option>
+                            <option value="ks">Kolmogorov-Smirnov Test</option>
+                            <option value="chi2">Chi-Square Test</option>
+                            <option value="anova">ANOVA</option>
+                        </select>
+                    </div>
+                    <button id="run-test" class="btn btn-primary">Run Test</button>
+                </div>
+                <div id="tests-content">
+                    <!-- Statistical test results will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Visualizations Tab -->
+            <div id="visualizations" class="comp-tab-content">
+                <h4>Comparison Visualizations</h4>
+                <div class="viz-controls">
+                    <button id="create-comparison-chart" class="btn btn-secondary">Create Chart</button>
+                    <button id="create-scatter-matrix" class="btn btn-secondary">Scatter Matrix</button>
+                    <button id="create-correlation-heatmap" class="btn btn-secondary">Correlation Heatmap</button>
+                </div>
+                <div id="visualizations-content">
+                    <!-- Comparison visualizations will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-actions">
+            <button id="save-comparison" class="btn btn-primary">Save Comparison</button>
+            <button id="export-comparison" class="btn btn-secondary">Export Results</button>
+            <button id="create-report" class="btn btn-secondary">Generate Report</button>
+        </div>
+    </div>
+
+    <div class="saved-comparisons">
+        <h3>Saved Comparisons</h3>
+        <div id="saved-comparisons-list" class="comparisons-grid">
+            <!-- Saved comparisons will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<div id="comparison-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Performing comparison analysis...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

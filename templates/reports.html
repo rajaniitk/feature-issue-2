@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block header_title %}Report Generator{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <div class="dashboard-header">
+        <h2>Report Generator</h2>
+        <p>Generate comprehensive reports from your data analysis</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="reports-dataset-select">Select Dataset:</label>
+            <select id="reports-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-reports-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="report-generator" id="report-generator" style="display: none;">
+        <div class="report-config">
+            <h3>Report Configuration</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="report-type">Report Type:</label>
+                    <select id="report-type" class="form-control">
+                        <option value="eda">Exploratory Data Analysis</option>
+                        <option value="statistical">Statistical Analysis</option>
+                        <option value="ml">Machine Learning Report</option>
+                        <option value="custom">Custom Report</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="report-format">Output Format:</label>
+                    <select id="report-format" class="form-control">
+                        <option value="html">HTML</option>
+                        <option value="pdf">PDF</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="report-title">Report Title:</label>
+                <input type="text" id="report-title" class="form-control" placeholder="Enter report title">
+            </div>
+
+            <div class="form-group">
+                <label for="report-description">Description:</label>
+                <textarea id="report-description" class="form-control" rows="3" placeholder="Brief description of the report"></textarea>
+            </div>
+
+            <div class="sections-selection" id="sections-selection">
+                <h4>Include Sections:</h4>
+                <div class="checkbox-grid">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-summary" checked>
+                        <span>Dataset Summary</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-statistics" checked>
+                        <span>Descriptive Statistics</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-missing">
+                        <span>Missing Values Analysis</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-correlation">
+                        <span>Correlation Analysis</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-distributions">
+                        <span>Distribution Analysis</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-outliers">
+                        <span>Outlier Detection</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-visualizations">
+                        <span>Visualizations</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="include-recommendations">
+                        <span>Recommendations</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="generate-report" class="btn btn-primary">Generate Report</button>
+                <button id="preview-report" class="btn btn-secondary">Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-preview" id="report-preview" style="display: none;">
+        <h3>Report Preview</h3>
+        <div id="preview-content" class="preview-content">
+            <!-- Report preview will be displayed here -->
+        </div>
+        <div class="preview-actions">
+            <button id="download-report" class="btn btn-primary">Download Report</button>
+            <button id="edit-report" class="btn btn-secondary">Edit Report</button>
+            <button id="share-report" class="btn btn-secondary">Share Report</button>
+        </div>
+    </div>
+
+    <div class="saved-reports">
+        <h3>Generated Reports</h3>
+        <div id="reports-list" class="reports-grid">
+            <!-- Saved reports will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<div id="reports-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p id="reports-loading-message">Generating your report...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+{% endblock %}

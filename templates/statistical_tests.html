@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+
+{% block title %}Statistical Tests{% endblock %}
+
+{% block header_title %}Statistical Tests{% endblock %}
+
+{% block content %}
+
+<div class="stats-container">
+    <div class="dashboard-header">
+        <h2>📊 Statistical Tests Dashboard</h2>
+        <p>Perform comprehensive statistical analysis and hypothesis testing on your data</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="stats-dataset-select">🗃️ Select Dataset:</label>
+            <select id="stats-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-stats-datasets" class="btn btn-secondary">🔄 Refresh Datasets</button>
+    </div>
+
+    <div class="statistics-sections" id="stats-sections" style="display: none;">
+        
+        <!-- Descriptive Statistics -->
+        <div class="stats-section">
+            <h3>📈 Descriptive Statistics</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">✅ Any Data Type</span> Works with both numeric and categorical columns</li>
+                        <li><span class="requirement-badge">📊 Multiple Columns</span> Select one or more columns for analysis</li>
+                        <li><span class="requirement-badge">📈 Summary Stats</span> Generates mean, median, mode, standard deviation, etc.</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="desc-columns">Select Columns:</label>
+                    <select id="desc-columns" class="form-control" multiple>
+                        <!-- Columns will be populated here -->
+                    </select>
+                    <small>Hold Ctrl/Cmd to select multiple columns</small>
+                </div>
+                <button id="generate-descriptive" class="btn btn-primary">📊 Generate Statistics</button>
+                <div id="descriptive-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- Normality Tests -->
+        <div class="stats-section">
+            <h3>📊 Normality Tests</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Numeric Data</span> Requires one numeric column</li>
+                        <li><span class="requirement-badge">📈 Sample Size</span> Minimum 3 data points (varies by test)</li>
+                        <li><span class="requirement-badge">🎯 Shapiro-Wilk</span> 3-5000 samples</li>
+                        <li><span class="requirement-badge">🎯 Anderson-Darling</span> 5+ samples</li>
+                        <li><span class="requirement-badge">🎯 Jarque-Bera</span> 20+ samples</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="normality-column">Select Column:</label>
+                    <select id="normality-column" class="form-control">
+                        <option value="">Choose a numeric column...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="normality-test">Test Type:</label>
+                    <select id="normality-test" class="form-control">
+                        <option value="shapiro">Shapiro-Wilk Test</option>
+                        <option value="anderson_darling">Anderson-Darling Test</option>
+                        <option value="kolmogorov_smirnov">Kolmogorov-Smirnov Test</option>
+                        <option value="jarque_bera">Jarque-Bera Test</option>
+                        <option value="lilliefors">Lilliefors Test</option>
+                    </select>
+                </div>
+                <button id="run-normality" class="btn btn-primary">🧪 Run Test</button>
+                <div id="normality-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- Correlation Tests -->
+        <div class="stats-section">
+            <h3>🔗 Correlation Tests</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Numeric Data</span> Requires two numeric columns</li>
+                        <li><span class="requirement-badge">📈 Sample Size</span> Minimum 3 paired observations</li>
+                        <li><span class="requirement-badge">🎯 Pearson</span> Linear relationship, normal distribution</li>
+                        <li><span class="requirement-badge">🎯 Spearman</span> Monotonic relationship</li>
+                        <li><span class="requirement-badge">🎯 Kendall</span> Ordinal data, robust to outliers</li>
+                    </ul>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="corr-column1">First Column:</label>
+                        <select id="corr-column1" class="form-control">
+                            <option value="">Choose first column...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="corr-column2">Second Column:</label>
+                        <select id="corr-column2" class="form-control">
+                            <option value="">Choose second column...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="correlation-method">Correlation Method:</label>
+                    <select id="correlation-method" class="form-control">
+                        <option value="pearson">Pearson (Linear)</option>
+                        <option value="spearman">Spearman (Monotonic)</option>
+                        <option value="kendall">Kendall (Ordinal)</option>
+                    </select>
+                </div>
+                <button id="run-correlation" class="btn btn-primary">🔗 Calculate Correlation</button>
+                <div id="correlation-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- T-Tests -->
+        <div class="stats-section">
+            <h3>🧪 T-Tests</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Numeric Data</span> Requires numeric dependent variable</li>
+                        <li><span class="requirement-badge">📈 One-Sample</span> 1 numeric column, test value, 3+ observations</li>
+                        <li><span class="requirement-badge">📊 Two-Sample</span> 1 numeric + 1 categorical (2 groups), 4+ observations</li>
+                        <li><span class="requirement-badge">🔗 Paired</span> 2 numeric columns, 3+ paired observations</li>
+                        <li><span class="requirement-badge">🎯 Assumptions</span> Normal distribution, equal variances (for independent)</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="ttest-type">Test Type:</label>
+                    <select id="ttest-type" class="form-control">
+                        <option value="one_sample">One Sample T-Test</option>
+                        <option value="two_sample">Independent T-Test</option>
+                        <option value="paired">Paired T-Test</option>
+                    </select>
+                </div>
+                
+                <div id="ttest-one-sample" class="ttest-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="ttest-column">Column:</label>
+                        <select id="ttest-column" class="form-control">
+                            <option value="">Choose a numeric column...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="test-value">Test Value (μ₀):</label>
+                        <input type="number" id="test-value" class="form-control" step="any" placeholder="Enter test value">
+                    </div>
+                </div>
+
+                <div id="ttest-two-sample" class="ttest-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="ttest-data-column">Data Column:</label>
+                        <select id="ttest-data-column" class="form-control">
+                            <option value="">Choose data column...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ttest-group-column">Group Column:</label>
+                        <select id="ttest-group-column" class="form-control">
+                            <option value="">Choose group column...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="ttest-paired" class="ttest-config" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ttest-before">Before Column:</label>
+                            <select id="ttest-before" class="form-control">
+                                <option value="">Choose before column...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ttest-after">After Column:</label>
+                            <select id="ttest-after" class="form-control">
+                                <option value="">Choose after column...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="alpha-level">Significance Level (α):</label>
+                    <select id="alpha-level" class="form-control">
+                        <option value="0.05">0.05</option>
+                        <option value="0.01">0.01</option>
+                        <option value="0.1">0.1</option>
+                    </select>
+                </div>
+
+                <button id="run-ttest" class="btn btn-primary">🧪 Run T-Test</button>
+                <div id="ttest-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- ANOVA -->
+        <div class="stats-section">
+            <h3>📊 Analysis of Variance (ANOVA)</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Numeric Data</span> Requires numeric dependent variable</li>
+                        <li><span class="requirement-badge">📈 One-Way</span> 1 categorical independent variable (2+ groups)</li>
+                        <li><span class="requirement-badge">📊 Two-Way</span> 2 categorical independent variables</li>
+                        <li><span class="requirement-badge">🎯 Sample Size</span> Minimum 5 observations total, 2+ per group</li>
+                        <li><span class="requirement-badge">🎯 Assumptions</span> Normal distribution, equal variances</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="anova-dependent">Dependent Variable:</label>
+                    <select id="anova-dependent" class="form-control">
+                        <option value="">Choose dependent variable...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="anova-independent">First Independent Variable:</label>
+                    <select id="anova-independent" class="form-control">
+                        <option value="">Choose first independent variable...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="anova-type">ANOVA Type:</label>
+                    <select id="anova-type" class="form-control">
+                        <option value="one_way">One-Way ANOVA</option>
+                        <option value="two_way">Two-Way ANOVA</option>
+                    </select>
+                </div>
+                <div id="two-way-controls" class="two-way-controls">
+                    <div class="alert alert-info">
+                        <strong>Two-Way ANOVA:</strong> Please select a second independent variable for two-way analysis.
+                    </div>
+                    <div class="form-group">
+                        <label for="anova-independent2">Second Independent Variable:</label>
+                        <select id="anova-independent2" class="form-control">
+                            <option value="">Choose second independent variable...</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="run-anova" class="btn btn-primary">📊 Run ANOVA</button>
+                <div id="anova-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- Chi-Square Tests -->
+        <div class="stats-section">
+            <h3>🎯 Chi-Square Tests</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Categorical Data</span> Requires categorical variables</li>
+                        <li><span class="requirement-badge">📈 Independence</span> 2 categorical variables</li>
+                        <li><span class="requirement-badge">🎯 Goodness of Fit</span> 1 categorical variable</li>
+                        <li><span class="requirement-badge">📊 Sample Size</span> Minimum 5 expected frequency per cell</li>
+                        <li><span class="requirement-badge">🎯 Assumptions</span> Independent observations, adequate sample size</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="chi-test-type">Test Type:</label>
+                    <select id="chi-test-type" class="form-control">
+                        <option value="independence">Test of Independence</option>
+                        <option value="goodness_of_fit">Goodness of Fit</option>
+                    </select>
+                </div>
+                
+                <div id="chi-independence" class="chi-config">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="chi-var1">First Variable:</label>
+                            <select id="chi-var1" class="form-control">
+                                <option value="">Choose first variable...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="chi-var2">Second Variable:</label>
+                            <select id="chi-var2" class="form-control">
+                                <option value="">Choose second variable...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chi-goodness" class="chi-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="chi-observed">Observed Variable:</label>
+                        <select id="chi-observed" class="form-control">
+                            <option value="">Choose observed variable...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="run-chi-square" class="btn btn-primary">🎯 Run Chi-Square Test</button>
+                <div id="chi-square-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- Non-Parametric Tests -->
+        <div class="stats-section">
+            <h3>📊 Non-Parametric Tests</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Ordinal Data</span> Works with ordinal or numeric data</li>
+                        <li><span class="requirement-badge">📈 Mann-Whitney</span> 2 groups, 3+ observations per group</li>
+                        <li><span class="requirement-badge">🔗 Wilcoxon</span> 2 paired columns, 6+ observations</li>
+                        <li><span class="requirement-badge">🎯 Kruskal-Wallis</span> 2+ groups, ordinal/numeric data</li>
+                        <li><span class="requirement-badge">📊 Friedman</span> 3+ columns, 6+ complete observations</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="nonparam-test-type">Test Type:</label>
+                    <select id="nonparam-test-type" class="form-control">
+                        <option value="mann_whitney">Mann-Whitney U Test</option>
+                        <option value="wilcoxon">Wilcoxon Signed-Rank Test</option>
+                        <option value="kruskal_wallis">Kruskal-Wallis Test</option>
+                        <option value="friedman">Friedman Test</option>
+                    </select>
+                </div>
+
+                <div id="mann-whitney-config" class="nonparam-config">
+                    <div class="form-group">
+                        <label for="mw-data-column">Data Column:</label>
+                        <select id="mw-data-column" class="form-control">
+                            <option value="">Choose data column...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mw-group-column">Group Column:</label>
+                        <select id="mw-group-column" class="form-control">
+                            <option value="">Choose group column...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="wilcoxon-config" class="nonparam-config" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="wilcoxon-col1">First Column:</label>
+                            <select id="wilcoxon-col1" class="form-control">
+                                <option value="">Choose first column...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wilcoxon-col2">Second Column:</label>
+                            <select id="wilcoxon-col2" class="form-control">
+                                <option value="">Choose second column...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="kruskal-config" class="nonparam-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="kw-dependent">Dependent Variable:</label>
+                        <select id="kw-dependent" class="form-control">
+                            <option value="">Choose dependent variable...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="kw-independent">Independent Variable:</label>
+                        <select id="kw-independent" class="form-control">
+                            <option value="">Choose independent variable...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="friedman-config" class="nonparam-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="friedman-columns">Select Columns:</label>
+                        <select id="friedman-columns" class="form-control" multiple>
+                            <!-- Columns will be populated here -->
+                        </select>
+                        <small>Hold Ctrl/Cmd to select multiple columns (minimum 3)</small>
+                    </div>
+                </div>
+
+                <button id="run-nonparametric" class="btn btn-primary">📊 Run Test</button>
+                <div id="nonparametric-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- Variance Tests -->
+        <div class="stats-section">
+            <h3>📊 Variance Tests</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Numeric Data</span> Requires 2+ numeric columns</li>
+                        <li><span class="requirement-badge">📈 Levene's Test</span> Robust to non-normality</li>
+                        <li><span class="requirement-badge">🎯 Bartlett's Test</span> Assumes normal distribution</li>
+                        <li><span class="requirement-badge">📊 Fligner-Killeen</span> Non-parametric alternative</li>
+                        <li><span class="requirement-badge">🎯 Sample Size</span> Minimum 3 observations per group</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="variance-test-type">Test Type:</label>
+                    <select id="variance-test-type" class="form-control">
+                        <option value="levene">Levene's Test</option>
+                        <option value="bartlett">Bartlett's Test</option>
+                        <option value="fligner">Fligner-Killeen Test</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="variance-columns">Select Columns:</label>
+                    <select id="variance-columns" class="form-control" multiple>
+                        <!-- Columns will be populated here -->
+                    </select>
+                    <small>Hold Ctrl/Cmd to select multiple columns (minimum 2)</small>
+                </div>
+                <button id="run-variance-test" class="btn btn-primary">📊 Run Variance Test</button>
+                <div id="variance-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- McNemar Test -->
+        <div class="stats-section">
+            <h3>🎯 McNemar Test</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Categorical Data</span> Requires 2 categorical columns</li>
+                        <li><span class="requirement-badge">📈 2x2 Table</span> Creates 2x2 contingency table</li>
+                        <li><span class="requirement-badge">🔗 Paired Data</span> For paired/matched samples</li>
+                        <li><span class="requirement-badge">🎯 Sample Size</span> Adequate discordant pairs needed</li>
+                        <li><span class="requirement-badge">📊 Usage</span> Before/after comparisons</li>
+                    </ul>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mcnemar-col1">First Column:</label>
+                        <select id="mcnemar-col1" class="form-control">
+                            <option value="">Choose first column...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mcnemar-col2">Second Column:</label>
+                        <select id="mcnemar-col2" class="form-control">
+                            <option value="">Choose second column...</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="run-mcnemar" class="btn btn-primary">🎯 Run McNemar Test</button>
+                <div id="mcnemar-results" class="results-area"></div>
+            </div>
+        </div>
+
+        <!-- Multiple Comparisons -->
+        <div class="stats-section">
+            <h3>📊 Multiple Comparisons</h3>
+            <div class="section-content">
+                <div class="test-requirements">
+                    <h4>📋 Requirements:</h4>
+                    <ul>
+                        <li><span class="requirement-badge">📊 Numeric Data</span> Requires numeric dependent variable</li>
+                        <li><span class="requirement-badge">📈 Post-hoc</span> Used after significant ANOVA</li>
+                        <li><span class="requirement-badge">🎯 Tukey HSD</span> Equal sample sizes, conservative</li>
+                        <li><span class="requirement-badge">📊 Bonferroni</span> Very conservative, any sample sizes</li>
+                        <li><span class="requirement-badge">🎯 Holm-Bonferroni</span> Less conservative than Bonferroni</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="mc-dependent">Dependent Variable:</label>
+                    <select id="mc-dependent" class="form-control">
+                        <option value="">Choose dependent variable...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mc-independent">Independent Variable:</label>
+                    <select id="mc-independent" class="form-control">
+                        <option value="">Choose independent variable...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mc-method">Method:</label>
+                    <select id="mc-method" class="form-control">
+                        <option value="tukey">Tukey HSD</option>
+                        <option value="bonferroni">Bonferroni</option>
+                        <option value="holm">Holm-Bonferroni</option>
+                    </select>
+                </div>
+                <button id="run-multiple-comparison" class="btn btn-primary">📊 Run Multiple Comparison</button>
+                <div id="multiple-comparison-results" class="results-area"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="stats-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Running statistical test...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
+{% endblock %}

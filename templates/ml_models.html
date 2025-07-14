@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}ML Models{% endblock %}
+
+{% block header_title %}Machine Learning Engine{% endblock %}
+
+{% block content %}
+<div class="ml-container">
+    <div class="dashboard-header">
+        <h2>Machine Learning Models</h2>
+        <p>Build, train, and evaluate machine learning models on your data</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="ml-dataset-select">Select Dataset:</label>
+            <select id="ml-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-ml-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="ml-workflow" id="ml-workflow" style="display: none;">
+        
+        <!-- Step 1: Feature Selection -->
+        <div class="workflow-step">
+            <h3>Step 1: Feature Selection</h3>
+            <div class="step-content">
+                <div class="features-panel">
+                    <div class="feature-columns">
+                        <h4>Available Features</h4>
+                        <div id="available-features" class="feature-list">
+                            <!-- Features will be populated here -->
+                        </div>
+                    </div>
+                    <div class="feature-controls">
+                        <button id="select-all-features" class="btn btn-secondary">Select All</button>
+                        <button id="clear-features" class="btn btn-secondary">Clear All</button>
+                        <button id="auto-select-features" class="btn btn-primary">Auto Select</button>
+                    </div>
+                    <div class="target-selection">
+                        <h4>Target Variable</h4>
+                        <select id="target-column" class="form-control">
+                            <option value="">Select target column...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Model Configuration -->
+        <div class="workflow-step">
+            <h3>Step 2: Model Configuration</h3>
+            <div class="step-content">
+                <div class="model-config">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="problem-type">Problem Type:</label>
+                            <select id="problem-type" class="form-control">
+                                <option value="classification">Classification</option>
+                                <option value="regression">Regression</option>
+                                <option value="clustering">Clustering</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="algorithm">Algorithm:</label>
+                            <select id="algorithm" class="form-control">
+                                <option value="random_forest">Random Forest</option>
+                                <option value="logistic_regression">Logistic Regression</option>
+                                <option value="svm">Support Vector Machine</option>
+                                <option value="gradient_boosting">Gradient Boosting</option>
+                                <option value="neural_network">Neural Network</option>
+                                <option value="kmeans">K-Means (Clustering)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="test-size">Test Split (%):</label>
+                            <input type="number" id="test-size" class="form-control" value="20" min="10" max="50">
+                        </div>
+                    </div>
+
+                    <div class="hyperparameters-section" id="hyperparameters">
+                        <h4>Hyperparameters</h4>
+                        <div id="hyperparameter-controls">
+                            <!-- Dynamic hyperparameter controls will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Training & Evaluation -->
+        <div class="workflow-step">
+            <h3>Step 3: Training & Evaluation</h3>
+            <div class="step-content">
+                <div class="training-controls">
+                    <button id="train-model" class="btn btn-primary">Train Model</button>
+                    <button id="cross-validate" class="btn btn-secondary">Cross Validate</button>
+                    <button id="hyperparameter-tune" class="btn btn-secondary">Auto Tune</button>
+                </div>
+                
+                <div id="training-results" class="results-section" style="display: none;">
+                    <div class="metrics-cards">
+                        <div class="metric-card">
+                            <h4>Training Score</h4>
+                            <span id="training-score">-</span>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Validation Score</h4>
+                            <span id="validation-score">-</span>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Test Score</h4>
+                            <span id="test-score">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detailed-metrics">
+                        <h4>Detailed Metrics</h4>
+                        <div id="detailed-metrics-content">
+                            <!-- Detailed metrics will be displayed here -->
+                        </div>
+                    </div>
+
+                    <div class="feature-importance" id="feature-importance" style="display: none;">
+                        <h4>Feature Importance</h4>
+                        <div id="importance-chart">
+                            <!-- Feature importance chart will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Model Management -->
+        <div class="workflow-step">
+            <h3>Step 4: Model Management</h3>
+            <div class="step-content">
+                <div class="model-actions">
+                    <div class="form-group">
+                        <label for="model-name">Model Name:</label>
+                        <input type="text" id="model-name" class="form-control" placeholder="Enter model name">
+                    </div>
+                    <div class="button-group">
+                        <button id="save-model" class="btn btn-primary" disabled>Save Model</button>
+                        <button id="download-model" class="btn btn-secondary" disabled>Download</button>
+                        <button id="make-predictions" class="btn btn-secondary" disabled>Make Predictions</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="saved-models" id="saved-models">
+        <h3>Saved Models</h3>
+        <div id="models-list" class="models-grid">
+            <!-- Saved models will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<div id="ml-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p id="loading-message">Training your model...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ml_dashboard.js') }}"></script>
+{% endblock %}

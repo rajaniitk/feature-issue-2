@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Insights Generator{% endblock %}
+
+{% block header_title %}Insights Generator{% endblock %}
+
+{% block content %}
+<div class="insights-container">
+    <div class="dashboard-header">
+        <h2>Insights Generator</h2>
+        <p>Automatically discover patterns and insights in your data</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="insights-dataset-select">Select Dataset:</label>
+            <select id="insights-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-insights-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="insights-controls" id="insights-controls" style="display: none;">
+        <div class="analysis-options">
+            <h3>Analysis Options</h3>
+            
+            <div class="checkbox-grid">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="detect-outliers" checked>
+                    <span>Outlier Detection</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="correlation-insights" checked>
+                    <span>Correlation Insights</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="distribution-insights" checked>
+                    <span>Distribution Analysis</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="missing-pattern">
+                    <span>Missing Data Patterns</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="feature-importance">
+                    <span>Feature Importance</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="data-quality">
+                    <span>Data Quality Assessment</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="insight-depth">Analysis Depth:</label>
+                <select id="insight-depth" class="form-control">
+                    <option value="quick">Quick Analysis</option>
+                    <option value="standard" selected>Standard Analysis</option>
+                    <option value="deep">Deep Analysis</option>
+                </select>
+            </div>
+
+            <button id="generate-insights" class="btn btn-primary">Generate Insights</button>
+        </div>
+    </div>
+
+    <div class="insights-results" id="insights-results" style="display: none;">
+        <h3>Discovered Insights</h3>
+        
+        <div class="insights-summary">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>Total Insights</h4>
+                    <span id="total-insights">0</span>
+                </div>
+                <div class="summary-card critical">
+                    <h4>Critical Issues</h4>
+                    <span id="critical-insights">0</span>
+                </div>
+                <div class="summary-card warning">
+                    <h4>Warnings</h4>
+                    <span id="warning-insights">0</span>
+                </div>
+                <div class="summary-card info">
+                    <h4>Recommendations</h4>
+                    <span id="recommendation-insights">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-categories">
+            
+            <!-- Data Quality Insights -->
+            <div class="insight-category">
+                <h4>Data Quality</h4>
+                <div id="data-quality-insights" class="insights-list">
+                    <!-- Data quality insights will be populated here -->
+                </div>
+            </div>
+
+            <!-- Statistical Insights -->
+            <div class="insight-category">
+                <h4>Statistical Patterns</h4>
+                <div id="statistical-insights" class="insights-list">
+                    <!-- Statistical insights will be populated here -->
+                </div>
+            </div>
+
+            <!-- Correlation Insights -->
+            <div class="insight-category">
+                <h4>Relationships & Correlations</h4>
+                <div id="correlation-insights-list" class="insights-list">
+                    <!-- Correlation insights will be populated here -->
+                </div>
+            </div>
+
+            <!-- Outlier Insights -->
+            <div class="insight-category">
+                <h4>Outliers & Anomalies</h4>
+                <div id="outlier-insights" class="insights-list">
+                    <!-- Outlier insights will be populated here -->
+                </div>
+            </div>
+
+            <!-- Feature Insights -->
+            <div class="insight-category">
+                <h4>Feature Analysis</h4>
+                <div id="feature-insights" class="insights-list">
+                    <!-- Feature insights will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="insight-category">
+                <h4>Recommendations</h4>
+                <div id="recommendations-list" class="insights-list">
+                    <!-- Recommendations will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-actions">
+            <button id="export-insights" class="btn btn-primary">Export Insights</button>
+            <button id="save-insights" class="btn btn-secondary">Save Report</button>
+            <button id="schedule-analysis" class="btn btn-secondary">Schedule Analysis</button>
+        </div>
+    </div>
+
+    <div class="insights-history">
+        <h3>Previous Insights</h3>
+        <div id="insights-history-list" class="history-grid">
+            <!-- Previous insights will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<div id="insights-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Analyzing your data for insights...</p>
+        <div class="progress-bar">
+            <div id="insights-progress" class="progress-fill"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/insights.js') }}"></script>
+{% endblock %}

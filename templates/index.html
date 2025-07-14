@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block header_title %}Welcome to the EDA App{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <h2>Your Data Science Toolkit</h2>
+    <p>
+        This application provides a comprehensive suite of tools for exploratory data analysis (EDA),
+        feature engineering, machine learning, and reporting.
+    </p>
+    <div class="cta-buttons">
+        <a href="{{ url_for('data_processor.upload_file') }}" class="btn btn-primary">Start Analyzing</a>
+        <a href="{{ url_for('column_analysis') }}" class="btn btn-secondary">Explore Features</a>
+    </div>
+</div>
+
+<div class="component-overview">
+    <h3>Key Components</h3>
+    <div class="component-grid">
+        <div class="component-card">
+            <i class="icon">📊</i> <!-- Placeholder for icon -->
+            <h4>Column Analysis</h4>
+            <p>Understand individual columns.</p>
+            <a href="{{ url_for('column_analysis') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">⚖️</i>
+            <h4>Comparison</h4>
+            <p>Compare datasets or features.</p>
+            <a href="{{ url_for('comparison') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">⚙️</i>
+            <h4>Feature Engineering</h4>
+            <p>Create and transform features.</p>
+            <a href="{{ url_for('feature_engineering') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">✨</i>
+            <h4>Adv. Feature Engineering</h4>
+            <p>Advanced feature transformations.</p>
+            <a href="{{ url_for('advance_feature_engineering') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">🤖</i>
+            <h4>ML Engine</h4>
+            <p>Build and train models.</p>
+            <a href="{{ url_for('ml_models') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">📈</i>
+            <h4>Analysis Dashboard</h4>
+            <p>Interactive data exploration.</p>
+            <a href="{{ url_for('analysis_dashboard') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">🔬</i>
+            <h4>Statistical Tests</h4>
+            <p>Perform statistical analysis.</p>
+            <a href="{{ url_for('statistical_tests') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">🎨</i>
+            <h4>Visualization Engine</h4>
+            <p>Create beautiful plots.</p>
+            <a href="{{ url_for('visualization_dashboard') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">💡</i>
+            <h4>Insights Generator</h4>
+            <p>Discover hidden patterns.</p>
+            <a href="{{ url_for('insights') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">📄</i>
+            <h4>Report Generator</h4>
+            <p>Generate detailed reports.</p>
+            <a href="{{ url_for('reports') }}" class="btn btn-small">Go</a>
+        </div>
+        <div class="component-card">
+            <i class="icon">☁️</i>
+            <h4>Data Upload</h4>
+            <p>Load your data easily.</p>
+            <a href="{{ url_for('data_processor.upload_file') }}" class="btn btn-small">Go</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Specific JS for index page if needed
+    console.log("Index page loaded!");
+</script>
+{% endblock %}

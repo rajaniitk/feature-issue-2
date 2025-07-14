@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Column Analysis{% endblock %}
+
+{% block header_title %}Column Analysis{% endblock %}
+
+{% block content %}
+<div class="column-analysis-container">
+    <div class="dashboard-header">
+        <h2>Column Analysis</h2>
+        <p>Detailed analysis of individual columns in your dataset</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="column-dataset-select">Select Dataset:</label>
+            <select id="column-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-column-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="column-selector" id="column-selector" style="display: none;">
+        <div class="form-group">
+            <label for="column-select">Select Column:</label>
+            <select id="column-select" class="form-control">
+                <option value="">Choose a column...</option>
+            </select>
+        </div>
+        <button id="analyze-column" class="btn btn-primary">Analyze Column</button>
+    </div>
+
+    <div class="column-overview" id="column-overview" style="display: none;">
+        <h3>Column Overview</h3>
+        <div class="overview-cards">
+            <div class="overview-card">
+                <h4>Column Name</h4>
+                <span id="column-name">-</span>
+            </div>
+            <div class="overview-card">
+                <h4>Data Type</h4>
+                <span id="column-type">-</span>
+            </div>
+            <div class="overview-card">
+                <h4>Non-Null Count</h4>
+                <span id="non-null-count">-</span>
+            </div>
+            <div class="overview-card">
+                <h4>Missing Values</h4>
+                <span id="missing-values">-</span>
+            </div>
+            <div class="overview-card">
+                <h4>Unique Values</h4>
+                <span id="unique-values">-</span>
+            </div>
+            <div class="overview-card">
+                <h4>Memory Usage</h4>
+                <span id="memory-usage">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="analysis-tabs" id="analysis-tabs" style="display: none;">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="basic-stats">Basic Statistics</button>
+            <button class="tab-button" data-tab="transformation">Transformation</button>
+            <button class="tab-button" data-tab="patterns">Patterns</button>
+            <button class="tab-button" data-tab="quality">Data Quality</button>
+            <button class="tab-button" data-tab="relationships">Relationships</button>
+        </div>
+
+        <!-- Basic Statistics Tab -->
+        <div id="basic-stats" class="tab-content active">
+            <h4>Descriptive Statistics</h4>
+            <div id="basic-stats-content" class="stats-content">
+                <!-- Basic statistics will be populated here -->
+            </div>
+        </div>
+
+        <!-- Transformation Tab -->
+        <div id="transformation" class="tab-content">
+            <div class="transformation-sections">
+                <!-- Transformation Analysis Section -->
+                <div class="transformation-section">
+                    <div class="section-header">
+                        <h5>� Transformation Analysis</h5>
+                        <div class="transformation-controls">
+                            <select id="transformation-type" class="form-control">
+                                <option value="standardize">Standardize (Z-score)</option>
+                                <option value="normalize">Normalize (Min-Max)</option>
+                                <option value="log">Log Transform</option>
+                                <option value="sqrt">Square Root</option>
+                                <option value="reciprocal">Reciprocal</option>
+                            </select>
+                            <button id="run-transformation" class="btn btn-primary action-button">Analyze Transformation</button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div id="transformation-results">
+                            <p>Select a transformation type and click "Analyze Transformation" to see the analysis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Cleaning Section -->
+                <div class="transformation-section">
+                    <div class="section-header">
+                        <h5>🧹 Data Cleaning</h5>
+                        <div class="cleaning-controls">
+                            <div class="cleaning-options">
+                                <label>
+                                    <input type="checkbox" id="remove-nulls" checked>
+                                    Remove Null Values
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="remove-duplicates" checked>
+                                    Remove Duplicates
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="remove-outliers">
+                                    Remove Outliers
+                                </label>
+                            </div>
+                            <button id="run-cleaning" class="btn btn-warning action-button">Analyze Cleaning Impact</button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div id="cleaning-results">
+                            <p>Configure cleaning options and click "Analyze Cleaning Impact" to see the impact analysis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Encoding Section -->
+                <div class="transformation-section">
+                    <div class="section-header">
+                        <h5>🔤 Data Encoding</h5>
+                        <div class="encoding-controls">
+                            <select id="encoding-type" class="form-control">
+                                <option value="label">Label Encoding</option>
+                                <option value="onehot">One-Hot Encoding</option>
+                                <option value="binary">Binary Encoding</option>
+                                <option value="target">Target Encoding</option>
+                                <option value="frequency">Frequency Encoding</option>
+                            </select>
+                            <button id="run-encoding" class="btn btn-success action-button">Analyze Encoding</button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div id="encoding-results">
+                            <p>Select an encoding type and click "Analyze Encoding" to see the encoding analysis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="transformation-section">
+                    <div class="section-header">
+                        <h5>📤 Export Data</h5>
+                        <div class="export-controls">
+                            <select id="export-format" class="form-control">
+                                <option value="csv">CSV Format</option>
+                                <option value="json">JSON Format</option>
+                                <option value="excel">Excel Format</option>
+                            </select>
+                            <button id="export-analysis" class="btn btn-primary action-button">Export Analysis</button>
+                            <button id="export-cleaned-data" class="btn btn-secondary action-button">Export Cleaned Data</button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div id="export-results">
+                            <p>Select export format and click the appropriate export button to download data.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patterns Tab -->
+        <div id="patterns" class="tab-content">
+            <h4>Data Patterns</h4>
+            <div class="patterns-analysis">
+                <div class="pattern-section">
+                    <h5>Value Patterns</h5>
+                    <div id="value-patterns">
+                        <!-- Value patterns will be displayed here -->
+                    </div>
+                </div>
+                <div class="pattern-section">
+                    <h5>Outlier Detection</h5>
+                    <div id="outlier-detection">
+                        <!-- Outlier information will be displayed here -->
+                    </div>
+                </div>
+                <div class="pattern-section">
+                    <h5>Seasonality/Trends</h5>
+                    <div id="trends-analysis">
+                        <!-- Trends analysis will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Quality Tab -->
+        <div id="quality" class="tab-content">
+            <h4>Data Quality Assessment</h4>
+            <div class="quality-metrics">
+                <div class="quality-section">
+                    <h5>Completeness</h5>
+                    <div id="completeness-analysis">
+                        <!-- Completeness analysis will be displayed here -->
+                    </div>
+                </div>
+                <div class="quality-section">
+                    <h5>Consistency</h5>
+                    <div id="consistency-analysis">
+                        <!-- Consistency analysis will be displayed here -->
+                    </div>
+                </div>
+                <div class="quality-section">
+                    <h5>Validity</h5>
+                    <div id="validity-analysis">
+                        <!-- Validity analysis will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relationships Tab -->
+        <div id="relationships" class="tab-content">
+            <h4>Column Relationships</h4>
+            <div class="relationships-analysis">
+                <div class="form-group">
+                    <label for="compare-column">Compare with:</label>
+                    <select id="compare-column" class="form-control">
+                        <option value="">Select column to compare...</option>
+                    </select>
+                </div>
+                <button id="analyze-relationship" class="btn btn-primary">Analyze Relationship</button>
+                <div id="relationship-results">
+                    <!-- Relationship analysis results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="column-actions" id="column-actions" style="display: none;">
+        <h4>Quick Actions</h4>
+        <div class="action-buttons">
+            <button id="quick-transform" class="btn btn-primary">Quick Transform</button>
+            <button id="quick-clean" class="btn btn-secondary">Quick Clean</button>
+            <button id="quick-export" class="btn btn-success">Quick Export</button>
+        </div>
+    </div>
+</div>
+
+<div id="column-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Analyzing column data...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/column_analysis.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EDA App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark_theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>EDA Dashboard</h3>
+            <button class="close-btn" id="sidebar-close-btn">&times;</button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('data_processor.upload_file') }}">Upload Data</a></li>
+            <li><a href="{{ url_for('column_analysis') }}">Column Analysis</a></li>
+            <li><a href="{{ url_for('comparison') }}">Comparison</a></li>
+            <li><a href="{{ url_for('feature_engineering') }}">Feature Engineering</a></li>
+            <li><a href="{{ url_for('advance_feature_engineering') }}">Adv. Feature Engineering</a></li>
+            <li><a href="{{ url_for('ml_models') }}">ML Engine</a></li>
+            <li><a href="{{ url_for('analysis_dashboard') }}">Analysis Dashboard</a></li>
+            <li><a href="{{ url_for('statistical_tests') }}">Statistical Tests</a></li>
+            <li><a href="{{ url_for('visualization_dashboard') }}">Visualization Engine</a></li>
+            <li><a href="{{ url_for('insights') }}">Insights Generator</a></li>
+            <li><a href="{{ url_for('reports') }}">Report Generator</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <header class="header">
+            <button class="hamburger-btn" id="sidebar-toggle-btn">
+                &#9776; <!-- Hamburger icon -->
+            </button>
+            <h1>{% block header_title %}EDA Dashboard{% endblock %}</h1>
+        </header>
+
+        <main class="container">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/responsive-tables.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

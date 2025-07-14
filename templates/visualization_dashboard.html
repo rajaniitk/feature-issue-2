@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Visualization Dashboard{% endblock %}
+
+{% block header_title %}Visualization Dashboard{% endblock %}
+
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="visualization-container">
+    <div class="dashboard-header">
+        <h2>Data Visualization Dashboard</h2>
+        <p>Create interactive charts and graphs to explore your data</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="viz-dataset-select">Select Dataset:</label>
+            <select id="viz-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-viz-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="visualization-controls" id="viz-controls" style="display: none;">
+        <div class="control-panel">
+            <h3>Chart Configuration</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="chart-type">Chart Type:</label>
+                    <select id="chart-type" class="form-control">
+                        <option value="histogram">Histogram</option>
+                        <option value="scatter">Scatter Plot</option>
+                        <option value="box">Box Plot</option>
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="heatmap">Heatmap</option>
+                        <option value="violin">Violin Plot</option>
+                        <option value="pie">Pie Chart</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="x-column">X-Axis Column:</label>
+                    <select id="x-column" class="form-control">
+                        <option value="">Select column...</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="y-column-group">
+                    <label for="y-column">Y-Axis Column:</label>
+                    <select id="y-column" class="form-control">
+                        <option value="">Select column...</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="color-column-group" style="display: none;">
+                    <label for="color-column">Color By:</label>
+                    <select id="color-column" class="form-control">
+                        <option value="">None</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="chart-title">Chart Title:</label>
+                    <input type="text" id="chart-title" class="form-control" placeholder="Enter chart title">
+                </div>
+
+                <div class="form-group">
+                    <label for="chart-theme">Theme:</label>
+                    <select id="chart-theme" class="form-control">
+                        <option value="plotly">Default</option>
+                        <option value="plotly_white">White</option>
+                        <option value="plotly_dark">Dark</option>
+                        <option value="ggplot2">GGPlot2</option>
+                        <option value="seaborn">Seaborn</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="create-chart" class="btn btn-primary">Create Chart</button>
+                <button id="save-chart" class="btn btn-secondary" disabled>Save Chart</button>
+                <button id="clear-chart" class="btn btn-secondary">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div id="chart-display" class="chart-area">
+            <div class="placeholder">
+                <i class="icon">📊</i>
+                <p>Select a dataset and configure your chart to begin visualization</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="saved-charts" id="saved-charts" style="display: none;">
+        <h3>Saved Charts</h3>
+        <div id="charts-gallery" class="charts-grid">
+            <!-- Saved charts will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<div id="viz-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p>Creating your visualization...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/visualizations.js') }}"></script>
+{% endblock %}

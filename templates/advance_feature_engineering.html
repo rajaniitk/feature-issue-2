@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Feature Engineering{% endblock %}
+
+{% block header_title %}Advanced Feature Engineering{% endblock %}
+
+{% block content %}
+<div class="advanced-fe-container">
+    <div class="dashboard-header">
+        <h2>Advanced Feature Engineering</h2>
+        <p>Create sophisticated features using advanced techniques and algorithms</p>
+    </div>
+
+    <div class="dataset-selector">
+        <div class="form-group">
+            <label for="adv-fe-dataset-select">Select Dataset:</label>
+            <select id="adv-fe-dataset-select" class="form-control">
+                <option value="">Choose a dataset...</option>
+            </select>
+        </div>
+        <button id="refresh-adv-fe-datasets" class="btn btn-secondary">Refresh</button>
+    </div>
+
+    <div class="feature-engineering-workspace" id="fe-workspace" style="display: none;">
+        
+        <!-- Feature Engineering Techniques -->
+        <div class="fe-techniques">
+            <h3>Feature Engineering Techniques</h3>
+            
+            <div class="technique-categories">
+                
+                <!-- Polynomial Features -->
+                <div class="technique-category">
+                    <h4>Polynomial Features</h4>
+                    <div class="technique-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="polynomial-features-select">Select Feature:</label>
+                                <select id="polynomial-features-select" class="form-control">
+                                    <!-- Features will be populated here -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="polynomial-degree">Degree:</label>
+                                <input type="number" id="polynomial-degree" class="form-control" value="2" min="2" max="5">
+                            </div>
+                        </div>
+                        <button id="apply-polynomial-features" class="btn btn-primary">Create Polynomial Features</button>
+                    </div>
+                </div>
+
+                <!-- Feature Extraction -->
+                <div class="technique-category">
+                    <h4>Feature Extraction</h4>
+                    <div class="technique-content">
+                        <div class="extraction-methods">
+                            <button id="apply-pca" class="btn btn-secondary">Principal Component Analysis</button>
+                            <button id="apply-ica" class="btn btn-secondary">Independent Component Analysis</button>
+                            <button id="apply-lda" class="btn btn-secondary">Linear Discriminant Analysis</button>
+                            <button id="apply-tsne" class="btn btn-secondary">t-SNE</button>
+                        </div>
+                        <div class="extraction-params" id="extraction-params" style="display: none;">
+                            <!-- Parameters for selected extraction method will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Feature Engineering -->
+                <div class="technique-category">
+                    <h4>Text Feature Engineering</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="text-columns">Select Text Columns:</label>
+                            <select id="text-columns" class="form-control" multiple>
+                                <!-- Text columns will be populated here -->
+                            </select>
+                        </div>
+                        <div class="text-techniques">
+                            <button id="apply-tfidf" class="btn btn-secondary">TF-IDF Vectorization</button>
+                            <button id="apply-word2vec" class="btn btn-secondary">Word2Vec Embeddings</button>
+                            <button id="apply-sentiment" class="btn btn-secondary">Sentiment Analysis</button>
+                            <button id="extract-ngrams" class="btn btn-secondary">N-Grams</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interaction Features -->
+                <div class="technique-category">
+                    <h4>Interaction Features</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label>Select Features:</label>
+                            <div id="interaction-features-list">
+                                <!-- Feature checkboxes will be populated here -->
+                            </div>
+                        </div>
+                        <button id="apply-interaction-features" class="btn btn-primary">Create Interaction Features</button>
+                    </div>
+                </div>
+
+                <!-- Feature Selection -->
+                <div class="technique-category">
+                    <h4>Feature Selection</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="fs-method">Method:</label>
+                            <select id="fs-method" class="form-control">
+                                <option value="univariate">Univariate Selection</option>
+                                <option value="rfe">Recursive Feature Elimination</option>
+                                <option value="mutual_info">Mutual Information</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fs-k-value">Top K Features:</label>
+                            <input type="number" id="fs-k-value" class="form-control" value="5" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Features:</label>
+                            <div id="fs-features-list">
+                                <!-- Feature checkboxes will be populated here -->
+                            </div>
+                        </div>
+                        <button id="apply-feature-selection" class="btn btn-primary">Apply Selection</button>
+                        <div id="fs-results"></div>
+                    </div>
+                </div>
+
+                <!-- Dimensionality Reduction -->
+                <div class="technique-category">
+                    <h4>Dimensionality Reduction</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="dr-method">Method:</label>
+                            <select id="dr-method" class="form-control">
+                                <option value="PCA">Principal Component Analysis</option>
+                                <option value="ICA">Independent Component Analysis</option>
+                                <option value="LDA">Linear Discriminant Analysis</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dr-components">Components:</label>
+                            <input type="number" id="dr-components" class="form-control" value="2" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Features:</label>
+                            <div id="dr-features-list">
+                                <!-- Feature checkboxes will be populated here -->
+                            </div>
+                        </div>
+                        <button id="apply-dimensionality-reduction" class="btn btn-primary">Apply Reduction</button>
+                        <div id="dr-results"></div>
+                    </div>
+                </div>
+
+                <!-- Time Series Features -->
+                <div class="technique-category">
+                    <h4>Time Series Features</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="time-features-select">Select DateTime Feature:</label>
+                            <select id="time-features-select" class="form-control">
+                                <!-- DateTime features will be populated here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Time Features to Extract:</label>
+                            <div id="time-feature-types">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="hour">
+                                    <span>Hour</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="day">
+                                    <span>Day</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="month">
+                                    <span>Month</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="year">
+                                    <span>Year</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="weekday">
+                                    <span>Weekday</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button id="apply-time-features" class="btn btn-primary">Create Time Features</button>
+                    </div>
+                </div>
+
+                <!-- Text Features -->
+                <div class="technique-category">
+                    <h4>Text Features</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="text-features-select">Select Text Feature:</label>
+                            <select id="text-features-select" class="form-control">
+                                <!-- Text features will be populated here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Text Features to Extract:</label>
+                            <div id="text-feature-types">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="length">
+                                    <span>Text Length</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="word_count">
+                                    <span>Word Count</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="sentiment">
+                                    <span>Sentiment</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" value="readability">
+                                    <span>Readability</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button id="apply-text-features" class="btn btn-primary">Create Text Features</button>
+                    </div>
+                </div>
+
+                <!-- Clustering Features -->
+                <div class="technique-category">
+                    <h4>Clustering Features</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="cluster-k">Number of Clusters:</label>
+                            <input type="number" id="cluster-k" class="form-control" value="3" min="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Features:</label>
+                            <div id="cluster-features-list">
+                                <!-- Feature checkboxes will be populated here -->
+                            </div>
+                        </div>
+                        <button id="apply-clustering-features" class="btn btn-primary">Create Clustering Features</button>
+                    </div>
+                </div>
+
+                <!-- Custom Transformations -->
+                <div class="technique-category">
+                    <h4>Custom Transformations</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="custom-transformation">Transformation:</label>
+                            <select id="custom-transformation" class="form-control">
+                                <option value="log">Log Transform</option>
+                                <option value="sqrt">Square Root</option>
+                                <option value="square">Square</option>
+                                <option value="reciprocal">Reciprocal</option>
+                                <option value="standardize">Standardize</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="custom-target-feature">Target Feature:</label>
+                            <select id="custom-target-feature" class="form-control">
+                                <!-- Features will be populated here -->
+                            </select>
+                        </div>
+                        <button id="apply-custom-transformations" class="btn btn-primary">Apply Transformation</button>
+                    </div>
+                </div>
+
+                <!-- Categorical Encoding -->
+                <div class="technique-category">
+                    <h4>Advanced Categorical Encoding</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="categorical-columns">Select Categorical Columns:</label>
+                            <select id="categorical-columns" class="form-control" multiple>
+                                <!-- Categorical columns will be populated here -->
+                            </select>
+                        </div>
+                        <div class="encoding-methods">
+                            <div class="form-group">
+                                <label for="encoding-method">Encoding Method:</label>
+                                <select id="encoding-method" class="form-control">
+                                    <option value="target">Target Encoding</option>
+                                    <option value="frequency">Frequency Encoding</option>
+                                    <option value="binary">Binary Encoding</option>
+                                    <option value="helmert">Helmert Encoding</option>
+                                    <option value="hash">Feature Hashing</option>
+                                </select>
+                            </div>
+                            <button id="apply-encoding" class="btn btn-primary">Apply Encoding</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Selection -->
+                <div class="technique-category">
+                    <h4>Advanced Feature Selection</h4>
+                    <div class="technique-content">
+                        <div class="selection-methods">
+                            <div class="form-group">
+                                <label for="selection-method">Selection Method:</label>
+                                <select id="selection-method" class="form-control">
+                                    <option value="univariate">Univariate Selection</option>
+                                    <option value="rfe">Recursive Feature Elimination</option>
+                                    <option value="lasso">Lasso Regularization</option>
+                                    <option value="mutual_info">Mutual Information</option>
+                                    <option value="variance">Variance Threshold</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="target-feature">Target Column:</label>
+                                <select id="target-feature" class="form-control">
+                                    <option value="">Select target column...</option>
+                                </select>
+                            </div>
+                            <button id="apply-selection" class="btn btn-primary">Apply Feature Selection</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Feature Creation -->
+                <div class="technique-category">
+                    <h4>Custom Feature Creation</h4>
+                    <div class="technique-content">
+                        <div class="form-group">
+                            <label for="feature-name">Feature Name:</label>
+                            <input type="text" id="feature-name" class="form-control" placeholder="Enter feature name">
+                        </div>
+                        <div class="form-group">
+                            <label for="feature-formula">Formula:</label>
+                            <textarea id="feature-formula" class="form-control" rows="3" placeholder="e.g., col1 * col2 + np.log(col3)"></textarea>
+                            <small>Use column names and mathematical operations. Available functions: np.log, np.sqrt, np.exp, etc.</small>
+                        </div>
+                        <button id="create-custom-feature" class="btn btn-primary">Create Custom Feature</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Engineered Features Display -->
+        <div class="engineered-features-section">
+            <h3>Engineered Features</h3>
+            <div id="engineered-features-list">
+                <!-- Engineered features will be displayed here -->
+            </div>
+            <div class="features-actions">
+                <button id="save-features" class="btn btn-primary">Save Features</button>
+                <button id="export-features" class="btn btn-secondary">Export Features</button>
+                <button id="reset-features" class="btn btn-danger">Reset Features</button>
+            </div>
+        </div>
+
+        <!-- Feature Pipeline -->
+        <div class="feature-pipeline">
+            <h3>Feature Engineering Pipeline</h3>
+            <div class="pipeline-steps" id="pipeline-steps">
+                <!-- Pipeline steps will be displayed here -->
+            </div>
+            <div class="pipeline-actions">
+                <button id="save-pipeline" class="btn btn-primary">Save Pipeline</button>
+                <button id="apply-pipeline" class="btn btn-secondary">Apply Pipeline</button>
+                <button id="clear-pipeline" class="btn btn-secondary">Clear Pipeline</button>
+            </div>
+        </div>
+
+        <!-- Results Preview -->
+        <div class="results-preview" id="results-preview" style="display: none;">
+            <h3>Feature Engineering Results</h3>
+            <div class="results-summary">
+                <div class="result-cards">
+                    <div class="result-card">
+                        <h4>Original Features</h4>
+                        <span id="original-features-count">-</span>
+                    </div>
+                    <div class="result-card">
+                        <h4>New Features</h4>
+                        <span id="new-features-count">-</span>
+                    </div>
+                    <div class="result-card">
+                        <h4>Total Features</h4>
+                        <span id="total-features-count">-</span>
+                    </div>
+                    <div class="result-card">
+                        <h4>Performance Impact</h4>
+                        <span id="performance-impact">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="results-table" id="results-table">
+                <!-- Results table will be displayed here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="adv-fe-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <p id="adv-fe-loading-message">Creating advanced features...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/advance_feature_engineering.js') }}"></script>
+{% endblock %}

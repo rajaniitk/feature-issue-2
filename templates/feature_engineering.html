@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block title %}Feature Engineering - EDA Application{% endblock %}
+
+{% block page_title %}Feature Engineering{% endblock %}
+{% block page_subtitle %}Transform and create new features to improve your data quality{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/feature_engineering.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+    <a href="{{ url_for('index') }}">Dashboard</a>
+</li>
+<li class="breadcrumb-item active">Feature Engineering</li>
+{% endblock %}
+
+{% block content %}
+<!-- Dataset Selection -->
+<div class="fe-container">
+    <div class="card">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-database me-2"></i>Select Dataset
+                        </label>
+                        <select class="form-control" id="fe-dataset-select">
+                            <option value="">Choose a dataset...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button id="refresh-fe-datasets" class="btn btn-secondary">
+                        <i class="fas fa-sync me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Engineering Panel -->
+<div class="engineering-panel" id="engineering-panel" style="display: none;">
+    
+    <!-- Features Summary -->
+    <div class="fe-container">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-columns me-2"></i>Dataset Features
+                    <span id="features-count" class="badge badge-primary ms-2">0 features</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="features-summary">
+                    <!-- Features will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transformation Tabs -->
+    <div class="fe-container">
+        <div class="fe-tabs">
+            <button class="fe-tab-button active" data-tab="basic-transformations">
+                <i class="fas fa-cogs me-2"></i>Basic Transformations
+            </button>
+            <button class="fe-tab-button" data-tab="missing-values">
+                <i class="fas fa-question-circle me-2"></i>Missing Values
+            </button>
+            <button class="fe-tab-button" data-tab="feature-creation">
+                <i class="fas fa-plus-circle me-2"></i>Feature Creation
+            </button>
+        </div>
+
+        <!-- Basic Transformations Tab -->
+        <div class="fe-tab-content active" id="basic-transformations">
+            <div class="row">
+                <!-- Scaling -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-expand-arrows-alt me-2"></i>Scaling</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Feature</label>
+                                <select id="scaling-feature" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Method</label>
+                                <select id="scaling-method" class="form-control">
+                                    <option value="standard">Standard Scaling</option>
+                                    <option value="minmax">Min-Max Scaling</option>
+                                    <option value="robust">Robust Scaling</option>
+                                </select>
+                            </div>
+                            <button id="apply-scaling" class="btn btn-primary">Apply Scaling</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Encoding -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-code me-2"></i>Encoding</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Feature</label>
+                                <select id="encoding-feature" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Method</label>
+                                <select id="encoding-method" class="form-control">
+                                    <option value="one_hot">One-Hot Encoding</option>
+                                    <option value="label">Label Encoding</option>
+                                    <option value="frequency">Frequency Encoding</option>
+                                </select>
+                            </div>
+                            <button id="apply-encoding" class="btn btn-primary">Apply Encoding</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Binning -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-boxes me-2"></i>Binning</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Feature</label>
+                                <select id="binning-feature" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Bins</label>
+                                <input type="number" id="binning-bins" class="form-control" value="5" min="2" max="20">
+                            </div>
+                            <div class="form-group">
+                                <label>Method</label>
+                                <select id="binning-method" class="form-control">
+                                    <option value="equal_width">Equal Width</option>
+                                    <option value="equal_frequency">Equal Frequency</option>
+                                    <option value="kmeans">K-Means</option>
+                                </select>
+                            </div>
+                            <button id="apply-binning" class="btn btn-primary">Apply Binning</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transformation -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-function me-2"></i>Mathematical Transform</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Feature</label>
+                                <select id="transformation-feature" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Method</label>
+                                <select id="transformation-method" class="form-control">
+                                    <option value="log">Log Transform</option>
+                                    <option value="sqrt">Square Root</option>
+                                    <option value="reciprocal">Reciprocal</option>
+                                    <option value="square">Square</option>
+                                </select>
+                            </div>
+                            <button id="apply-transformation" class="btn btn-primary">Apply Transform</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing Values Tab -->
+        <div class="fe-tab-content" id="missing-values">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-question-circle me-2"></i>Handle Missing Values</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Feature</label>
+                                <select id="missing-feature" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Strategy</label>
+                                <select id="missing-strategy" class="form-control">
+                                    <option value="mean">Mean</option>
+                                    <option value="median">Median</option>
+                                    <option value="mode">Mode</option>
+                                    <option value="drop">Drop Rows</option>
+                                    <option value="forward_fill">Forward Fill</option>
+                                    <option value="backward_fill">Backward Fill</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="handle-missing" class="btn btn-primary">Handle Missing Values</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Creation Tab -->
+        <div class="fe-tab-content" id="feature-creation">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-plus-circle me-2"></i>Create New Features</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>First Feature</label>
+                                <select id="create-feature-1" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Operation</label>
+                                <select id="create-operation" class="form-control">
+                                    <option value="add">Addition (+)</option>
+                                    <option value="subtract">Subtraction (-)</option>
+                                    <option value="multiply">Multiplication (×)</option>
+                                    <option value="divide">Division (÷)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Second Feature</label>
+                                <select id="create-feature-2" class="form-control">
+                                    <option value="">Select feature...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button id="create-features" class="btn btn-primary form-control">Create Feature</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engineered Features List -->
+    <div class="fe-container">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-magic me-2"></i>Engineered Features
+                </h5>
+                <div class="btn-group">
+                    <button id="preview-features" class="btn btn-secondary">Preview</button>
+                    <button id="export-features" class="btn btn-primary">Export</button>
+                    <button id="reset-features" class="btn btn-danger">Reset All</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="engineered-features-list">
+                    <p class="no-features">No engineered features yet. Use the tools above to create new features.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Download Section -->
+<div class="download-section" id="download-section" style="display: none;">
+    <h3><i class="fas fa-download"></i> Download Processed Dataset</h3>
+    <p>Your dataset has been processed with the applied feature engineering transformations.</p>
+    <div class="download-options">
+        <button class="download-btn" onclick="downloadDataset('csv')">
+            <i class="fas fa-file-csv"></i>
+            Download CSV
+        </button>
+        <button class="download-btn" onclick="downloadDataset('excel')">
+            <i class="fas fa-file-excel"></i>
+            Download Excel
+        </button>
+        <button class="download-btn" onclick="downloadDataset('json')">
+            <i class="fas fa-file-code"></i>
+            Download JSON
+        </button>
+    </div>
+    <div class="progress-container" id="download-progress" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="progress-text">Preparing download...</p>
+    </div>
+</div>
+
+<!-- Enhanced Loading Modal -->
+<div id="fe-loading-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner"></div>
+        <h4>Processing...</h4>
+        <p id="loading-message">Please wait while we process your feature engineering request.</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/feature_engineering.js') }}"></script>
+{% endblock %}
