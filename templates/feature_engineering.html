@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="ml-container">
+<div class="fe-container">
     <div class="dashboard-header">
         <h2>Feature Engineering</h2>
         <p>Transform and create new features to improve your data quality</p>
@@ -34,119 +34,102 @@
         <button id="refresh-fe-datasets" class="btn btn-secondary">Refresh</button>
     </div>
 
-    <div class="ml-workflow" id="engineering-panel" style="display: none;">
+    <div class="engineering-panel" id="engineering-panel" style="display: none;">
         
         <!-- Features Summary -->
-        <div class="workflow-step">
+        <div class="stats-section">
             <h3>Dataset Features</h3>
-            <div class="step-content">
-                <div class="features-panel">
-                    <div class="feature-columns">
-                        <h4>Available Features <span id="features-count" class="badge">0 features</span></h4>
-                        <div id="features-summary" class="feature-list">
-                            <!-- Features will be populated here -->
-                        </div>
-                    </div>
+            <div class="section-content">
+                <div id="features-summary" class="results-area">
+                    <!-- Features will be populated here -->
                 </div>
             </div>
         </div>
 
+        <!-- Feature Transformations -->
+        <div class="stats-section">
             <h3>Feature Transformations</h3>
-            <div class="step-content">
-                <div class="analysis-sections">
-                    <div class="section-grid">
-                        <!-- Scaling Section -->
-                        <div class="analysis-section">
-                            <h3>Feature Scaling</h3>
-                            <div class="content-area">
-                                <div class="form-group">
-                                    <label for="scaling-feature">Feature:</label>
-                                    <select id="scaling-feature" class="form-control">
-                                        <option value="">Select feature...</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="scaling-method">Method:</label>
-                                    <select id="scaling-method" class="form-control">
-                                        <option value="standard">Standard Scaling</option>
-                                        <option value="minmax">Min-Max Scaling</option>
-                                        <option value="robust">Robust Scaling</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button id="apply-scaling" class="btn btn-primary">Apply Scaling</button>
-                        </div>
-
-                        <!-- Encoding Section -->
-                        <div class="analysis-section">
-                            <h3>Categorical Encoding</h3>
-                            <div class="content-area">
-                                <div class="form-group">
-                                    <label for="encoding-feature">Feature:</label>
-                                    <select id="encoding-feature" class="form-control">
-                                        <option value="">Select feature...</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="encoding-method">Method:</label>
-                                    <select id="encoding-method" class="form-control">
-                                        <option value="one_hot">One-Hot Encoding</option>
-                                        <option value="label">Label Encoding</option>
-                                        <option value="frequency">Frequency Encoding</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button id="apply-encoding" class="btn btn-primary">Apply Encoding</button>
-                        </div>
-
-                        <!-- Binning Section -->
-                        <div class="analysis-section">
-                            <h3>Feature Binning</h3>
-                            <div class="content-area">
-                                <div class="form-group">
-                                    <label for="binning-feature">Feature:</label>
-                                    <select id="binning-feature" class="form-control">
-                                        <option value="">Select feature...</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="binning-bins">Number of Bins:</label>
-                                    <input type="number" id="binning-bins" class="form-control" value="5" min="2" max="20">
-                                </div>
-                                <div class="form-group">
-                                    <label for="binning-method">Method:</label>
-                                    <select id="binning-method" class="form-control">
-                                        <option value="equal_width">Equal Width</option>
-                                        <option value="equal_frequency">Equal Frequency</option>
-                                        <option value="kmeans">K-Means</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button id="apply-binning" class="btn btn-primary">Apply Binning</button>
-                        </div>
-
-                        <!-- Mathematical Transform Section -->
-                        <div class="analysis-section">
-                            <h3>Mathematical Transform</h3>
-                            <div class="content-area">
-                                <div class="form-group">
-                                    <label for="transformation-feature">Feature:</label>
-                                    <select id="transformation-feature" class="form-control">
-                                        <option value="">Select feature...</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="transformation-method">Method:</label>
-                                    <select id="transformation-method" class="form-control">
-                                        <option value="log">Log Transform</option>
-                                        <option value="sqrt">Square Root</option>
-                                        <option value="reciprocal">Reciprocal</option>
-                                        <option value="square">Square</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button id="apply-transformation" class="btn btn-primary">Apply Transform</button>
-                        </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <!-- Scaling -->
+                    <div class="form-group">
+                        <label for="scaling-feature">Feature:</label>
+                        <select id="scaling-feature" class="form-control">
+                            <option value="">Select feature...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="scaling-method">Method:</label>
+                        <select id="scaling-method" class="form-control">
+                            <option value="standard">Standard Scaling</option>
+                            <option value="minmax">Min-Max Scaling</option>
+                            <option value="robust">Robust Scaling</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="apply-scaling" class="btn btn-primary">Apply Scaling</button>
+                
+                <div class="form-row">
+                    <!-- Encoding -->
+                    <div class="form-group">
+                        <label for="encoding-feature">Feature:</label>
+                        <select id="encoding-feature" class="form-control">
+                            <option value="">Select feature...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="encoding-method">Method:</label>
+                        <select id="encoding-method" class="form-control">
+                            <option value="one_hot">One-Hot Encoding</option>
+                            <option value="label">Label Encoding</option>
+                            <option value="frequency">Frequency Encoding</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="apply-encoding" class="btn btn-primary">Apply Encoding</button>
+                
+                <div class="form-row">
+                    <!-- Binning -->
+                    <div class="form-group">
+                        <label for="binning-feature">Feature:</label>
+                        <select id="binning-feature" class="form-control">
+                            <option value="">Select feature...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="binning-bins">Number of Bins:</label>
+                        <input type="number" id="binning-bins" class="form-control" value="5" min="2" max="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="binning-method">Method:</label>
+                        <select id="binning-method" class="form-control">
+                            <option value="equal_width">Equal Width</option>
+                            <option value="equal_frequency">Equal Frequency</option>
+                            <option value="kmeans">K-Means</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="apply-binning" class="btn btn-primary">Apply Binning</button>
+                
+                <div class="form-row">
+                    <!-- Mathematical Transform -->
+                    <div class="form-group">
+                        <label for="transformation-feature">Feature:</label>
+                        <select id="transformation-feature" class="form-control">
+                            <option value="">Select feature...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transformation-method">Method:</label>
+                        <select id="transformation-method" class="form-control">
+                            <option value="log">Log Transform</option>
+                            <option value="sqrt">Square Root</option>
+                            <option value="reciprocal">Reciprocal</option>
+                            <option value="square">Square</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="apply-transformation" class="btn btn-primary">Apply Transform</button>
             </div>
         </div>
 
