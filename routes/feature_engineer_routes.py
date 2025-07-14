@@ -80,74 +80,119 @@ def download_dataset(dataset_id, format):
             logging.error(f"Failed to load dataset {dataset_id} or dataset is empty")
             abort(400, description="Dataset could not be loaded or is empty")
         
-        # Initialize feature engineer to apply transformations
-        feature_engineer = FeatureEngineer()
-        
-        # Check if we have any transformations to apply
+        # Get all transformations to apply in order
         transformations = FeatureEngineering.query.filter_by(dataset_id=dataset_id).order_by(FeatureEngineering.created_at).all()
         
         if transformations:
-            logging.info(f"Applying {len(transformations)} transformations for dataset {dataset_id}")
+            logging.info(f"Applying {len(transformations)} transformations for download")
             
-            # Apply each transformation using the service methods
-            for transformation in transformations:
+            # Apply transformations using existing service methods by creating a temporary dataset copy
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as temp_file:
+                df.to_csv(temp_file.name, index=False)
+                temp_path = temp_file.name
+            
+            # Temporarily update dataset path to work with transformed data
+            original_path = dataset.file_path
+            dataset.file_path = temp_path
+            
+            try:
+                feature_engineer = FeatureEngineer()
+                
+                # Apply each transformation using the existing service methods
+                for transformation in transformations:
+                    try:
+                        params = transformation.parameters
+                        transform_type = transformation.transformation_type
+                        
+                        # Use existing service methods instead of duplicating logic
+                        if transform_type == 'scaling':
+                            result = feature_engineer.scale_features(
+                                dataset_id, 
+                                params.get('columns', []), 
+                                params.get('method', 'standard')
+                            )
+                            if result['success']:
+                                logging.info(f"Applied scaling: {result['message']}")
+                        
+                        elif transform_type == 'encoding':
+                            result = feature_engineer.encode_categorical(
+                                dataset_id,
+                                params.get('columns', []),
+                                params.get('method', 'onehot')
+                            )
+                            if result['success']:
+                                logging.info(f"Applied encoding: {result['message']}")
+                        
+                        elif transform_type == 'binning':
+                            result = feature_engineer.bin_numerical(
+                                dataset_id,
+                                params.get('columns', []),
+                                params.get('method', 'equal_width'),
+                                params.get('bins', 5)
+                            )
+                            if result['success']:
+                                logging.info(f"Applied binning: {result['message']}")
+                        
+                        elif transform_type == 'numerical_transform':
+                            result = feature_engineer.transform_numerical(
+                                dataset_id,
+                                params.get('columns', []),
+                                params.get('method', 'log')
+                            )
+                            if result['success']:
+                                logging.info(f"Applied numerical transform: {result['message']}")
+                        
+                        elif transform_type == 'imputation':
+                            result = feature_engineer.handle_missing_values(
+                                dataset_id,
+                                params.get('columns', []),
+                                params.get('strategy', 'mean')
+                            )
+                            if result['success']:
+                                logging.info(f"Applied imputation: {result['message']}")
+                        
+                        elif transform_type == 'arithmetic':
+                            result = feature_engineer.create_arithmetic_features(
+                                dataset_id,
+                                params.get('feature1'),
+                                params.get('feature2'),
+                                params.get('operation')
+                            )
+                            if result['success']:
+                                logging.info(f"Applied arithmetic feature: {result['message']}")
+                        
+                        elif transform_type == 'polynomial':
+                            result = feature_engineer.polynomial_features(
+                                dataset_id,
+                                params.get('columns', []),
+                                params.get('degree', 2)
+                            )
+                            if result['success']:
+                                logging.info(f"Applied polynomial features: {result['message']}")
+                        
+                        elif transform_type == 'interaction':
+                            result = feature_engineer.interaction_features(
+                                dataset_id,
+                                params.get('columns', [])
+                            )
+                            if result['success']:
+                                logging.info(f"Applied interaction features: {result['message']}")
+                    
+                    except Exception as transform_error:
+                        logging.warning(f"Failed to apply transformation {transformation.id}: {str(transform_error)}")
+                        continue
+                
+                # Load the final transformed dataset
+                df = processor.load_dataset(dataset)
+                
+            finally:
+                # Restore original dataset path and cleanup
+                dataset.file_path = original_path
                 try:
-                    transform_config = transformation.transformation_config
-                    if isinstance(transform_config, str):
-                        import json
-                        transform_config = json.loads(transform_config)
-                    
-                    transform_type = transformation.transformation_type
-                    columns = transform_config.get('columns', [])
-                    
-                    # Apply transformations directly to DataFrame for download
-                    if transform_type == 'scaling':
-                        method = transform_config.get('method', 'standard')
-                        if columns and all(col in df.columns for col in columns):
-                            scaler = feature_engineer._get_fresh_scaler(method)
-                            df[columns] = scaler.fit_transform(df[columns])
-                            logging.info(f"Applied {method} scaling to columns: {columns}")
-                    
-                    elif transform_type == 'encoding':
-                        method = transform_config.get('method', 'onehot')
-                        for col in columns:
-                            if col in df.columns:
-                                if method == 'onehot':
-                                    dummies = pd.get_dummies(df[col], prefix=col)
-                                    df = pd.concat([df.drop(col, axis=1), dummies], axis=1)
-                                elif method == 'label':
-                                    from sklearn.preprocessing import LabelEncoder
-                                    le = LabelEncoder()
-                                    df[col] = le.fit_transform(df[col].astype(str))
-                                elif method == 'frequency':
-                                    freq_encoding = df[col].value_counts().to_dict()
-                                    df[col] = df[col].map(freq_encoding)
-                                logging.info(f"Applied {method} encoding to column: {col}")
-                    
-                    elif transform_type == 'binning':
-                        bins = transform_config.get('bins', 5)
-                        method = transform_config.get('method', 'equal_width')
-                        for col in columns:
-                            if col in df.columns and pd.api.types.is_numeric_dtype(df[col]):
-                                try:
-                                    if method == 'equal_width':
-                                        df[f'{col}_binned'] = pd.cut(df[col], bins=bins, labels=False)
-                                    elif method == 'equal_frequency':
-                                        df[f'{col}_binned'] = pd.qcut(df[col], q=bins, labels=False, duplicates='drop')
-                                    logging.info(f"Applied {method} binning to column: {col}")
-                                except Exception as bin_error:
-                                    logging.warning(f"Binning failed for {col}: {bin_error}")
-                    
-                    elif transform_type == 'mathematical':
-                        method = transform_config.get('method', 'log')
-                        for col in columns:
-                            if col in df.columns and pd.api.types.is_numeric_dtype(df[col]):
-                                try:
-                                    if method == 'log':
-                                        df[f'{col}_log'] = np.log1p(np.abs(df[col]))
-                                    elif method == 'sqrt':
-                                        df[f'{col}_sqrt'] = np.sqrt(np.abs(df[col]))
-                                    elif method == 'square':
+                    os.unlink(temp_path)
+                except:
+                    pass
                                         df[f'{col}_squared'] = df[col] ** 2
                                     elif method == 'reciprocal':
                                         df[f'{col}_reciprocal'] = 1 / (df[col] + 1e-8)
